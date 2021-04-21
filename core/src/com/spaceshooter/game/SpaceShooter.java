@@ -12,47 +12,51 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
-    Texture img;
-    Sprite sprite;
+    Texture playerImg;
+    Texture astroidImg;
+    Texture enemyImg;
+    Sprite playerSprite;
+    Sprite astroidSprite;
+    Sprite enemySprite;
     boolean movingRight = false;
     boolean movingLeft = false;
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        img = new Texture("spaceship.png");
-        sprite = new Sprite(img);
-        sprite.setPosition(Gdx.graphics.getWidth() / 2 - sprite.getWidth() / 2, 20);
+        playerImg = new Texture("spaceship.png");
+        playerSprite = new Sprite(playerImg);
+        playerSprite.setPosition(Gdx.graphics.getWidth() / 2 - playerSprite.getWidth() / 2, 20);
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render() {
         if (movingRight) {
-            if (sprite.getX() > Gdx.graphics.getWidth()-96) {
-                sprite.setX(Gdx.graphics.getWidth()-96);
+            if (playerSprite.getX() > Gdx.graphics.getWidth()-96) {
+                playerSprite.setX(Gdx.graphics.getWidth()-96);
             }else {
-                sprite.translateX(15f);
+                playerSprite.translateX(15f);
             }
         }
         if (movingLeft) {
-            if (sprite.getX() < 0) {
-                sprite.setX(0);
+            if (playerSprite.getX() < 0) {
+                playerSprite.setX(0);
             }else {
-                sprite.translateX(-15f);
+                playerSprite.translateX(-15f);
             }
         }
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(sprite, sprite.getX(), sprite.getY(),96,96);
+        batch.draw(playerSprite, playerSprite.getX(), playerSprite.getY(),96,96);
         batch.end();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        img.dispose();
+        playerImg.dispose();
     }
 
     @Override
