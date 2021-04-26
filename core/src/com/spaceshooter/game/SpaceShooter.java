@@ -8,15 +8,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
     Texture playerImg;
-    Texture astroidImg;
     Texture enemyImg;
-    Sprite playerSprite;
     Sprite astroidSprite;
+    Sprite playerSprite;
     Sprite enemySprite;
     boolean movingRight = false;
     boolean movingLeft = false;
@@ -27,30 +25,41 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         playerImg = new Texture("spaceship.png");
         playerSprite = new Sprite(playerImg);
         playerSprite.setPosition(Gdx.graphics.getWidth() / 2 - playerSprite.getWidth() / 2, 20);
+        Astroid astroid = new Astroid();
+        astroidSprite = astroid.getSprite();
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render() {
         if (movingRight) {
-            if (playerSprite.getX() > Gdx.graphics.getWidth()-96) {
-                playerSprite.setX(Gdx.graphics.getWidth()-96);
-            }else {
+            if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
+                playerSprite.setX(Gdx.graphics.getWidth() - 96);
+            } else {
                 playerSprite.translateX(15f);
             }
         }
         if (movingLeft) {
             if (playerSprite.getX() < 0) {
                 playerSprite.setX(0);
-            }else {
+            } else {
                 playerSprite.translateX(-15f);
             }
         }
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+
+        int i = 1;
+        if( i < 10){
+            Astroid astroid = new Astroid(speed);
+            i++;
+        }
+        astroidSprite.translateY(-3f);
+        Gdx.gl.glClearColor(41 / 255f, 37 / 255f, 74 / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(playerSprite, playerSprite.getX(), playerSprite.getY(),96,96);
+        batch.draw(playerSprite, playerSprite.getX(), playerSprite.getY(), 96, 96);
+        batch.draw(astroidSprite, astroidSprite.getX(), astroidSprite.getY(), 64, 64);
         batch.end();
+
     }
 
     @Override
