@@ -1,14 +1,14 @@
 package com.spaceshooter.game.desktop;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.spaceshooter.game.SpaceShooter;
 
 public class DesktopLauncher {
+
 	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		config.height = 1080;
-		config.width = 1920;
-		new LwjglApplication(new SpaceShooter(), config);
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowSizeLimits(800, 600, 800, 600);
+		new Lwjgl3Application(new SpaceShooter(), config);
 	}
 }
