@@ -6,57 +6,89 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.ScreenUtils;
+
+import java.util.ArrayList;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
-    Texture playerImg;
+    TextureAtlas playerTexture;
     Texture astroidImg;
     Texture enemyImg;
+    Texture laserImg;
     Sprite playerSprite;
     Sprite astroidSprite;
     Sprite enemySprite;
+    Sprite laserSprite;
+    ArrayList<Sprite> laserList;
     boolean movingRight = false;
     boolean movingLeft = false;
+    boolean playing = true;
+    int laserTimer;
+    Animation<TextureRegion> playerAnimation;
+    float elapsedTime = 0f;
+
 
     @Override
     public void create() {
         batch = new SpriteBatch();
-        playerImg = new Texture("spaceship.png");
-        playerSprite = new Sprite(playerImg);
+        playerTexture = new TextureAtlas("SpaceShip2.txt");
+        playerAnimation = new Animation(1f/30f, playerTexture.getRegions());
+        laserImg = new Texture("laserbeam1.png");
+        playerSprite = new Sprite();
         playerSprite.setPosition(Gdx.graphics.getWidth() / 2 - playerSprite.getWidth() / 2, 20);
+        laserList = new ArrayList<>();
+        createLaser(playerSprite.getX());
+        laserTimer = 0;
         Gdx.input.setInputProcessor(this);
     }
 
     @Override
     public void render() {
-        if (movingRight) {
-            if (playerSprite.getX() > Gdx.graphics.getWidth()-96) {
-                playerSprite.setX(Gdx.graphics.getWidth()-96);
-            }else {
+        elapsedTime += Gdx.graphics.getDeltaTime();
+        if (movingRight && playing) {
+            if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
+                playerSprite.setX(Gdx.graphics.getWidth() - 96);
+            } else {
                 playerSprite.translateX(15f);
             }
         }
-        if (movingLeft) {
+        if (movingLeft && playing) {
             if (playerSprite.getX() < 0) {
                 playerSprite.setX(0);
-            }else {
+            } else {
                 playerSprite.translateX(-15f);
             }
         }
-        Gdx.gl.glClearColor(0, 0, 0, 1);
+
+        Gdx.gl.glClearColor(28 / 255f, 35 / 255f, 46 / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
-        batch.draw(playerSprite, playerSprite.getX(), playerSprite.getY(),96,96);
+
+        for (Sprite sprite : laserList) {
+            sprite.draw(batch);
+        }
+        batch.draw(playerAnimation.getKeyFrame(elapsedTime,true),playerSprite.getX(),playerSprite.getY());
         batch.end();
+        if (laserSprite.getY() > Gdx.graphics.getHeight()) {
+            laserList.remove(laserSprite);
+            laserSprite.setAlpha(0);
+        } else if (playing) {
+            laserSprite.translateY(35f);
+        }
+        laserTimer++;
+        while (laserTimer > 20) {
+            createLaser(playerSprite.getX());
+            laserTimer = 0;
+        }
     }
 
     @Override
     public void dispose() {
         batch.dispose();
-        playerImg.dispose();
+        playerTexture.dispose();
+        laserImg.dispose();
     }
 
     @Override
@@ -108,5 +140,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;
+    }
+
+    public void createLaser(float playerSpriteX) {
+        laserSprite = new Sprite(laserImg);
+        laserSprite.setPosition(playerSpriteX + 32, 52);
+        laserList.add(laserSprite);
     }
 }
