@@ -7,18 +7,17 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.utils.ScreenUtils;
 
 import java.util.ArrayList;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
     TextureAtlas playerTexture;
-    Texture astroidImg;
+    Texture asteroidImg;
     Texture enemyImg;
     Texture laserImg;
     Sprite playerSprite;
-    Sprite astroidSprite;
+    Sprite asteroidSprite;
     Sprite enemySprite;
     Sprite laserSprite;
     ArrayList<Sprite> laserList;
@@ -28,6 +27,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int laserTimer;
     Animation<TextureRegion> playerAnimation;
     float elapsedTime = 0f;
+
+    AsteroidManager asteroidManager;
 
 
     @Override
@@ -41,12 +42,17 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         laserList = new ArrayList<>();
         createLaser(playerSprite.getX());
         laserTimer = 0;
+        Asteroid asteroid = new Asteroid();
+        asteroidSprite = asteroid.getSprite();
         Gdx.input.setInputProcessor(this);
+
+
+        asteroidManager = new AsteroidManager(3);
     }
 
     @Override
     public void render() {
-        elapsedTime += Gdx.graphics.getDeltaTime();
+//        elapsedTime += Gdx.graphics.getDeltaTime();
         if (movingRight && playing) {
             if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
                 playerSprite.setX(Gdx.graphics.getWidth() - 96);
@@ -70,7 +76,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             sprite.draw(batch);
         }
         batch.draw(playerAnimation.getKeyFrame(elapsedTime,true),playerSprite.getX(),playerSprite.getY());
-        batch.end();
+        asteroidSprite.translateY(-3f);
+        batch.draw(asteroidSprite, asteroidSprite.getX(), asteroidSprite.getY(), 64, 64);
         if (laserSprite.getY() > Gdx.graphics.getHeight()) {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
@@ -82,6 +89,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             createLaser(playerSprite.getX());
             laserTimer = 0;
         }
+
+        asteroidManager.render(batch);
+        batch.end();
     }
 
     @Override
