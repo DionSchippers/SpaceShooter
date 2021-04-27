@@ -3,9 +3,9 @@ package com.spaceshooter.game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-public class Astroid {
-    Texture astroidImg;
-    Sprite astroidSprite;
+public class Asteroid {
+    protected Texture texture;
+    protected Sprite sprite;
     int xVALint;
 
     public void setxVALint(int xVALint) {
@@ -16,18 +16,22 @@ public class Astroid {
         return xVALint;
     }
 
-    public Astroid() {
+    public void redistribute() {
         int min = 1;
         int max = 1750;
         double xVAL = (Math.random() * ((max - min) + 1)) + min;
         xVALint = (int) xVAL;
-        astroidImg = new Texture("Astroid.png");
-        astroidSprite = new Sprite(astroidImg);
-        astroidSprite.setPosition(xVALint, 1080);
-        astroidSprite.translateY(-3f);
+        sprite.setPosition(xVALint, 600);
+    }
+
+    public Asteroid() {
+
+        texture = new Texture("Asteroid.png");
+        sprite = new Sprite(texture);
+        this.redistribute();
     }
 
     public Sprite getSprite() {
-        return this.astroidSprite;
+        return this.sprite;
     }
 }
