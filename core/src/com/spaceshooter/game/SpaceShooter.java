@@ -6,19 +6,20 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import java.util.ArrayList;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
     TextureAtlas playerTexture;
-    Texture astroidImg;
+    Texture asteroidImg;
     Texture enemyImg;
     Texture laserImg;
     Sprite playerSprite;
-    Sprite astroidSprite;
+    Sprite asteroidSprite;
+    Sprite playerSprite;
     Sprite enemySprite;
     Sprite laserSprite;
     ArrayList<Sprite> laserList;
@@ -41,6 +42,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         laserList = new ArrayList<>();
         createLaser(playerSprite.getX());
         laserTimer = 0;
+        Astroid asteroid = new Astroid();
+        asteroidSprite = asteroid.getSprite();
         Gdx.input.setInputProcessor(this);
     }
 
@@ -82,6 +85,20 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             createLaser(playerSprite.getX());
             laserTimer = 0;
         }
+
+        int i = 1;
+        if( i < 10){
+            Astroid asteroid = new Astroid(speed);
+            i++;
+        }
+        asteroidSprite.translateY(-3f);
+        Gdx.gl.glClearColor(41 / 255f, 37 / 255f, 74 / 255f, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(playerSprite, playerSprite.getX(), playerSprite.getY(), 96, 96);
+        batch.draw(asteroidSprite, asteroidSprite.getX(), asteroidSprite.getY(), 64, 64);
+        batch.end();
+
     }
 
     @Override
