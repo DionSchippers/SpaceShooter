@@ -52,7 +52,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public void render() {
-//        elapsedTime += Gdx.graphics.getDeltaTime();
+        elapsedTime += Gdx.graphics.getDeltaTime();
         if (movingRight && playing) {
             if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
                 playerSprite.setX(Gdx.graphics.getWidth() - 96);
