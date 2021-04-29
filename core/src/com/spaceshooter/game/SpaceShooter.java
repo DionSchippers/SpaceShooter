@@ -4,6 +4,9 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.spaceshooter.game.controller.SerialController;
+
+import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
@@ -13,6 +16,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean movingLeft = false;
     boolean playing = true;
     float elapsedTime = 0f;
+
+    SerialController serialController = null;
+    boolean useSerialInput = true;
+    boolean useKeyboardInput = false;
 
     AsteroidManager asteroidManager;
     Player player;
@@ -25,14 +32,45 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
         asteroidManager = new AsteroidManager(10);
 
+        if (useSerialInput) {
+            serialController = new SerialController();
+            serialController.autoChooseCommPort();
+        }
+
         player = new Player();
         player.create();
+    }
+
+    public void updateSerialInput() {
+        if (serialController != null) {
+            try {
+                int direction = serialController.getDirection();
+                if (direction == 1) {
+                    movingRight = true;
+                    movingLeft = false;
+                }
+                else if (direction == -1) {
+                    movingRight = false;
+                    movingLeft = true;
+                }
+                else {
+                    movingRight = false;
+                    movingLeft = false;
+                }
+            }
+            catch (IOException e) {
+
+            }
+        }
     }
 
     @Override
     public void render() {
         elapsedTime += Gdx.graphics.getDeltaTime();
 
+        if (useSerialInput) {
+            updateSerialInput();
+        }
         player.move(movingRight, movingLeft, playing);
 
         Gdx.gl.glClearColor(28 / 255f, 35 / 255f, 46 / 255f, 1);
@@ -73,21 +111,25 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.A)
-            movingLeft = true;
+        if (useKeyboardInput) {
+            if (keycode == Input.Keys.A)
+                movingLeft = true;
 
-        if (keycode == Input.Keys.D)
-            movingRight = true;
+            if (keycode == Input.Keys.D)
+                movingRight = true;
+        }
         return false;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.A) {
-            movingLeft = false;
-        }
-        if (keycode == Input.Keys.D) {
-            movingRight = false;
+        if (useKeyboardInput) {
+            if (keycode == Input.Keys.A) {
+                movingLeft = false;
+            }
+            if (keycode == Input.Keys.D) {
+                movingRight = false;
+            }
         }
         return false;
     }
