@@ -35,18 +35,25 @@ public class AsteroidManager {
         return false;
     }
 
-    public void render(SpriteBatch batch) {
-        for (Asteroid asteroid: asteroids) {
-            if (hasGoneOffscreen(asteroid)) {
-                asteroid.redistribute();
-            }
-            asteroid.getSprite().translateY(-3f);
-            asteroid.getSprite().draw(batch);
-            float x = asteroid.xVALint;
-            float y = asteroid.getY();
+    public void render(SpriteBatch batch, boolean playing, int score) {
+        if (playing) {
+            for (Asteroid asteroid : asteroids) {
+                if (hasGoneOffscreen(asteroid)) {
+                    asteroid.redistribute();
+                }
+                asteroid.getSprite().translateY(-3f * (1f + score/10000f));
+                asteroid.getSprite().draw(batch);
+                float x = asteroid.xVALint;
+                float y = asteroid.getY();
 
-//            ss.circle(x+16, y+16, 16);
-            asteroid.c_asteroid.set(x+16, y+16, 16);
+                asteroid.c_asteroid.set(x + 16, y + 16, 16);
+            }
+        }
+    }
+
+    public void reset() {
+        for (Asteroid asteroid : asteroids) {
+            asteroid.redistribute();
         }
     }
 
