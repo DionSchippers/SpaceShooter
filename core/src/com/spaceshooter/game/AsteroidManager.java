@@ -62,7 +62,7 @@ public class AsteroidManager {
     public boolean colWithLaser(Rectangle r_laser) {
         for (Asteroid asteroid : this.asteroids) {
             if (Intersector.overlaps(asteroid.c_asteroid, r_laser)) {
-                asteroid.destroy();
+                asteroid.sprite.setPosition(asteroid.sprite.getX(), -10);
                 return true;
             }
         }

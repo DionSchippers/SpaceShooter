@@ -62,6 +62,7 @@ public class Player {
             laserSprite.setAlpha(0);
         } else if (playing) {
             laserSprite.translateY(50f);
+            r_laser.setPosition(laserSprite.getX(),laserSprite.getY());
         }
         laserTimer++;
         while (laserTimer > 20) {

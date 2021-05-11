@@ -13,6 +13,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean movingLeft = false;
     boolean playing = true;
     float elapsedTime = 0f;
+    BitmapFont font;
 
     AsteroidManager asteroidManager;
     Player player;
@@ -22,6 +23,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     public void create() {
         batch = new SpriteBatch();
         Gdx.input.setInputProcessor(this);
+        BitmapFont font = new BitmapFont();
 
         asteroidManager = new AsteroidManager(10);
 
@@ -53,13 +55,20 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         float x = player.playerSprite.getX();
         float y = player.playerSprite.getY();
         player.c_player.set(x+48, y+48, 48);
+
+
+
+//        font.draw(batch, "Hello World!", 10, 10);
+
         if (asteroidManager.colWithPlayer(player.c_player)) {
+            playing = false;
             System.out.println("jinks");
+
         }
         if (asteroidManager.colWithLaser(player.r_laser)) {
             player.laserList.remove(player.laserSprite);
             player.laserSprite.setAlpha(0);
-            System.out.println("appeltaart");
+            player.laserSprite.setPosition(player.laserSprite.getX(), 10000f);
         }
 
         batch.end();
