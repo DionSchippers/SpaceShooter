@@ -18,8 +18,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     float elapsedTime = 0f;
 
     SerialController serialController = null;
-    boolean useSerialInput = true;
-    boolean useKeyboardInput = false;
+    boolean useSerialInput = false;
+    boolean useKeyboardInput = true;
 
     AsteroidManager asteroidManager;
     Player player;
