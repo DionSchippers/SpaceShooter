@@ -53,7 +53,7 @@ public class AsteroidManager {
 
     public void reset() {
         for (Asteroid asteroid : asteroids) {
-            asteroid.redistribute();
+            asteroid.spawn();
         }
     }
 

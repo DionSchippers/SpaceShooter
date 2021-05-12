@@ -5,12 +5,13 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
@@ -23,12 +24,13 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean select = false;
     boolean playing = false;
     float elapsedTime = 0f;
-    BitmapFont font;
+    BitmapFont font, fonttitle;
     int score;
     public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
     String screen;
 
     AsteroidManager asteroidManager;
+    BackgroundManager starManager;
     Player player;
     Player player2;
 
@@ -38,11 +40,30 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         batch = new SpriteBatch();
         Gdx.input.setInputProcessor(this);
         screen = "start";
-        font = new BitmapFont();
-        font.setColor(Color.WHITE);
-        font.getData().setScale(2);
+//        font = new BitmapFont();
+//        font = new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt"));
+//        Label homescreen = new Label("Space Shooter", new Label.LabelStyle(new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt")), Color.MAGENTA));
+
+        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.local("fonts/Oxaniumfont.ttf"));
+        FreeTypeFontGenerator.FreeTypeFontParameter params = new FreeTypeFontGenerator.FreeTypeFontParameter();
+//        params.borderWidth = 1;
+        params.borderColor = Color.WHITE;
+        params.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
+        params.magFilter = Texture.TextureFilter.Nearest;
+        params.minFilter = Texture.TextureFilter.Nearest;
+        params.genMipMaps = true;
+        params.size = 80;
+
+        fonttitle = generator.generateFont(params);
+
+        params.size = 40;
+        font = generator.generateFont(params);
+
+//        font.setColor(Color.WHITE);
+        font.getData().setScale(1);
         score = 0;
         asteroidManager = new AsteroidManager(10);
+        starManager = new BackgroundManager(10);
 
         player = new Player();
         player.create("SpaceShip2.txt");
@@ -61,6 +82,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         batch.begin();
+        starManager.render(batch, playing, score);
 
         if (screen == "game") {
 
@@ -69,8 +91,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
             asteroidManager.render(batch, playing, score);
 
-        font.draw(batch, Integer.toString(score), Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()-20);
-        score++;
+
+            drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight()/2-20);
+            score++;
 
             if (asteroidManager.colWithPlayer(player.c_player) || asteroidManager.colWithPlayer(player2.c_player)) {
                 playing = false;
@@ -81,9 +104,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             score += player2.hitboxController(asteroidManager);
 
         } else if (screen == "gameover") {
-            font.draw(batch, "Je hebt " + Integer.toString(score) + " punten behaald!", Gdx.graphics.getWidth()/2-150, Gdx.graphics.getHeight()/2-30);
-            font.draw(batch, "Game Over", Gdx.graphics.getWidth()/2-40, Gdx.graphics.getHeight()/2);
-            font.draw(batch, "Press ENTER to restart", Gdx.graphics.getWidth()/2-110, Gdx.graphics.getHeight()/2-200);
+            drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
+            drawCenterText(font, "Game Over", 50);
+            drawCenterText(font, "Press ENTER to restart", -80);
 
             if (select) {
                 asteroidManager.reset();
@@ -94,8 +117,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 player2.reset();
             }
         } else if (screen == "start") {
-            font.draw(batch, "Space Shooter", Gdx.graphics.getWidth() / 2 - 40, Gdx.graphics.getHeight() / 2);
-            font.draw(batch, "Press ENTER to start", Gdx.graphics.getWidth() / 2 - 80, Gdx.graphics.getHeight() / 2 - 200);
+            drawCenterText(fonttitle, "Space Shooter", 50);
+            drawCenterText(font, "Press ENTER to start", -80);
 
             if (select) {
                 screen = "game";
@@ -179,5 +202,12 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     @Override
     public boolean scrolled(float amountX, float amountY) {
         return false;
+    }
+
+    public void drawCenterText(BitmapFont font, String text, int Height) {
+        GlyphLayout layout = new GlyphLayout(font, text);
+        float fontX = (Gdx.graphics.getWidth() - layout.width) / 2;
+        float fontY = Height + (Gdx.graphics.getHeight() + layout.height) / 2;
+        font.draw(batch, layout, fontX, fontY);
     }
 }
