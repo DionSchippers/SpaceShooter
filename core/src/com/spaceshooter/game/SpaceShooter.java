@@ -13,6 +13,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.*;
+import com.spaceshooter.game.controller.SerialController;
+
+import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
@@ -33,6 +39,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean selecting;
     int playerAmount;
     Sound GameTheme;
+
+    SerialController serialController = null;
+    boolean useSerialInput = false;
+    boolean useKeyboardInput = true;
 
     AsteroidManager asteroidManager;
     BackgroundManager starManager;
@@ -80,11 +90,48 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         player2.create("SpaceShip4.txt");
         enemy = new Enemy();
         enemy.create("SpaceShip4.txt");
+        asteroidManager = new AsteroidManager(10);
+
+        if (useSerialInput) {
+            serialController = new SerialController();
+            serialController.autoChooseCommPort();
+        }
+
+        player = new Player();
+        player.create();
+    }
+
+    public void updateSerialInput() {
+        if (serialController != null) {
+            try {
+                int direction = serialController.getDirection();
+                if (direction == 1) {
+                    movingRight = true;
+                    movingLeft = false;
+                }
+                else if (direction == -1) {
+                    movingRight = false;
+                    movingLeft = true;
+                }
+                else {
+                    movingRight = false;
+                    movingLeft = false;
+                }
+            }
+            catch (IOException e) {
+
+            }
+        }
     }
 
     @Override
     public void render() {
         elapsedTime += Gdx.graphics.getDeltaTime();
+
+        if (useSerialInput) {
+            updateSerialInput();
+        }
+        player.move(movingRight, movingLeft, playing);
 
         player.move(movingRight, movingLeft, playing);
         if (playerAmount == 2)
@@ -160,8 +207,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.A)
-            movingLeft = true;
+        if (useKeyboardInput) {
+            if (keycode == Input.Keys.A)
+                movingLeft = true;
 
         if (keycode == Input.Keys.D)
             movingRight = true;

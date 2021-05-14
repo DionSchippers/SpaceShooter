@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -85,6 +87,10 @@ public class Asteroid {
         explosionSound.setPitch(id, 1);
         explosionSound.setLooping(id, false);
 
+    }
+
+    public void destroy() {
+        
     }
 
     public Sprite getSprite() {
