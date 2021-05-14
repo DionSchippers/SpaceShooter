@@ -1,5 +1,7 @@
 package com.spaceshooter.game;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 public class AsteroidManager {
     private int numAsteroids;
     private ArrayList<Asteroid> asteroids;
+    int i;
 
     public AsteroidManager(int numAsteroids) {
         this.numAsteroids = numAsteroids;
@@ -35,7 +38,7 @@ public class AsteroidManager {
         return false;
     }
 
-    public void render(SpriteBatch batch, boolean playing, int score) {
+    public void render(SpriteBatch batch, boolean playing, int score, float time) {
         if (playing) {
             for (Asteroid asteroid : asteroids) {
                 if (hasGoneOffscreen(asteroid)) {
@@ -43,6 +46,7 @@ public class AsteroidManager {
                 }
                 asteroid.getSprite().translateY(-3f * (1f + score/10000f));
                 asteroid.getSprite().draw(batch);
+                asteroid.render(batch);
                 float x = asteroid.xVALint;
                 float y = asteroid.getY();
 
@@ -69,6 +73,9 @@ public class AsteroidManager {
     public boolean colWithLaser(Rectangle r_laser) {
         for (Asteroid asteroid : this.asteroids) {
             if (Intersector.overlaps(asteroid.c_asteroid, r_laser)) {
+                float x = asteroid.sprite.getX();
+                float y = asteroid.sprite.getY();
+                asteroid.explode(x, y);
                 asteroid.sprite.setPosition(asteroid.sprite.getX(), -10);
                 return true;
             }

@@ -28,6 +28,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int score;
     public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
     String screen;
+    int selectedOption;
+    boolean selecting;
+    int playerAmount;
 
     AsteroidManager asteroidManager;
     BackgroundManager starManager;
@@ -40,6 +43,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         batch = new SpriteBatch();
         Gdx.input.setInputProcessor(this);
         screen = "start";
+        selectedOption = 0;
+        selecting = true;
 //        font = new BitmapFont();
 //        font = new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt"));
 //        Label homescreen = new Label("Space Shooter", new Label.LabelStyle(new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt")), Color.MAGENTA));
@@ -59,10 +64,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         params.size = 40;
         font = generator.generateFont(params);
 
-//        font.setColor(Color.WHITE);
+        font.setColor(Color.WHITE);
         font.getData().setScale(1);
         score = 0;
-        asteroidManager = new AsteroidManager(10);
+        asteroidManager = new AsteroidManager(2);
         starManager = new BackgroundManager(10);
 
         player = new Player();
@@ -76,7 +81,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         elapsedTime += Gdx.graphics.getDeltaTime();
 
         player.move(movingRight, movingLeft, playing);
-        player2.move(movingRight2, movingLeft2, playing);
+        if (playerAmount == 2)
+            player2.move(movingRight2, movingLeft2, playing);
 
         Gdx.gl.glClearColor(56 / 255f, 70 / 255f, 92 / 255f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -87,9 +93,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         if (screen == "game") {
 
             player.playerController(elapsedTime, playing);
-            player2.playerController(elapsedTime, playing);
+            if (playerAmount == 2)
+                player2.playerController(elapsedTime, playing);
 
-            asteroidManager.render(batch, playing, score);
+            asteroidManager.render(batch, playing, score, elapsedTime);
 
 
             drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight()/2-20);
@@ -101,29 +108,17 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             }
 
             score += player.hitboxController(asteroidManager);
-            score += player2.hitboxController(asteroidManager);
+            if (playerAmount == 2)
+                score += player2.hitboxController(asteroidManager);
 
         } else if (screen == "gameover") {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
             drawCenterText(font, "Game Over", 50);
-            drawCenterText(font, "Press ENTER to restart", -80);
+            menuSelector("Restart", "Menu");
 
-            if (select) {
-                asteroidManager.reset();
-                screen = "game";
-                score = 0;
-                playing = true;
-                player.reset();
-                player2.reset();
-            }
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
-            drawCenterText(font, "Press ENTER to start", -80);
-
-            if (select) {
-                screen = "game";
-                playing = true;
-            }
+            menuSelector("1 speler", "2 spelers");
         }
 
         batch.end();
@@ -133,7 +128,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     public void dispose() {
         batch.dispose();
         player.dispose();
-        player2.dispose();
+        if (playerAmount == 2)
+            player2.dispose();
     }
 
     @Override
@@ -157,20 +153,30 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyUp(int keycode) {
-        if (keycode == Input.Keys.A)
+        if (keycode == Input.Keys.A) {
             movingLeft = false;
+            selecting = true;
+        }
 
-        if (keycode == Input.Keys.D)
+        if (keycode == Input.Keys.D) {
             movingRight = false;
+            selecting = true;
+        }
 
-        if (keycode == Input.Keys.DPAD_LEFT)
+        if (keycode == Input.Keys.DPAD_LEFT) {
             movingLeft2 = false;
+            selecting = true;
+        }
 
-        if (keycode == Input.Keys.DPAD_RIGHT)
+        if (keycode == Input.Keys.DPAD_RIGHT) {
             movingRight2 = false;
+            selecting = true;
+        }
 
-        if (keycode == Input.Keys.ENTER)
+        if (keycode == Input.Keys.ENTER) {
             select = false;
+            selecting = true;
+        }
         return false;
     }
 
@@ -209,5 +215,73 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         float fontX = (Gdx.graphics.getWidth() - layout.width) / 2;
         float fontY = Height + (Gdx.graphics.getHeight() + layout.height) / 2;
         font.draw(batch, layout, fontX, fontY);
+    }
+
+    public void menuSelector(String option1, String option2) {
+        font.setColor(Color.GRAY);
+        if (movingLeft && selecting || movingLeft2 && selecting) {
+            selectedOption--;
+            selecting = false;
+        }
+        if (movingRight && selecting || movingRight2 && selecting) {
+            selectedOption++;
+            selecting = false;
+        }
+        if (selectedOption > 1) selectedOption = 0;
+        if (selectedOption < 0) selectedOption = 1;
+
+        if (selectedOption == 0)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option1, -40);
+        font.setColor(Color.GRAY);
+
+        if (selectedOption == 1)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option2, -80);
+        font.setColor(Color.WHITE);
+
+        if (select && selecting) {
+            selecting = false;
+            if (selectedOption == 0) {
+                options(option1);
+            } else if (selectedOption == 1) {
+                options(option2);
+            }
+            selectedOption = 0;
+        }
+
+    }
+
+    public void options(String option) {
+        switch (option) {
+            case "1 speler":
+                playerAmount = 1;
+                screen = "game";
+                playing = true;
+                break;
+            case "2 spelers":
+                playerAmount = 2;
+                screen = "game";
+                playing = true;
+                break;
+            case "Restart":
+                asteroidManager.reset();
+                screen = "game";
+                score = 0;
+                playing = true;
+                player.reset();
+                if (playerAmount == 2)
+                    player2.reset();
+                break;
+            case "Menu":
+                screen = "start";
+                player.reset();
+                if (playerAmount == 2)
+                    player2.reset();
+                asteroidManager.reset();
+                score = 0;
+                break;
+        }
+
     }
 }
