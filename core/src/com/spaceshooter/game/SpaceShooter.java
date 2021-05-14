@@ -1,6 +1,7 @@
 package com.spaceshooter.game;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
@@ -31,11 +32,13 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int selectedOption;
     boolean selecting;
     int playerAmount;
+    Sound GameTheme;
 
     AsteroidManager asteroidManager;
     BackgroundManager starManager;
     Player player;
     Player player2;
+    Enemy enemy;
 
 
     @Override
@@ -67,13 +70,16 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.setColor(Color.WHITE);
         font.getData().setScale(1);
         score = 0;
-        asteroidManager = new AsteroidManager(2);
-        starManager = new BackgroundManager(10);
+        asteroidManager = new AsteroidManager(8);
+        starManager = new BackgroundManager(100);
+        GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
 
         player = new Player();
         player.create("SpaceShip2.txt");
         player2 = new Player();
         player2.create("SpaceShip4.txt");
+        enemy = new Enemy();
+        enemy.create("SpaceShip4.txt");
     }
 
     @Override
@@ -95,6 +101,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             player.playerController(elapsedTime, playing);
             if (playerAmount == 2)
                 player2.playerController(elapsedTime, playing);
+            enemy.enemyController(elapsedTime, playing);
 
             asteroidManager.render(batch, playing, score, elapsedTime);
 
@@ -105,7 +112,25 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             if (asteroidManager.colWithPlayer(player.c_player) || asteroidManager.colWithPlayer(player2.c_player)) {
                 playing = false;
                 screen = "gameover";
+                GameTheme.stop();
             }
+
+            enemy.hitboxController(player);
+            enemy.hitboxController(player2);
+            font.setColor(Color.RED);
+            font.draw(batch, Integer.toString(player.hp), 30f, 60f);
+            if (playerAmount == 2) {
+                font.setColor(Color.BLUE);
+                font.draw(batch, Integer.toString(player2.hp), Gdx.graphics.getWidth()-30f, 60f);
+            }
+            font.setColor(Color.WHITE);
+
+            if (player.hp < 1 || player2.hp < 1) {
+                playing = false;
+                screen = "gameover";
+                GameTheme.stop();
+            }
+
 
             score += player.hitboxController(asteroidManager);
             if (playerAmount == 2)
@@ -127,6 +152,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     @Override
     public void dispose() {
         batch.dispose();
+        GameTheme.dispose();
         player.dispose();
         if (playerAmount == 2)
             player2.dispose();
@@ -258,16 +284,20 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 playerAmount = 1;
                 screen = "game";
                 playing = true;
+                playMusic();
                 break;
+
             case "2 spelers":
                 playerAmount = 2;
                 screen = "game";
                 playing = true;
+                playMusic();
                 break;
             case "Restart":
                 asteroidManager.reset();
                 screen = "game";
                 score = 0;
+                playMusic();
                 playing = true;
                 player.reset();
                 if (playerAmount == 2)
@@ -283,5 +313,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 break;
         }
 
+    }
+    public void playMusic() {
+        long id = GameTheme.play(0.5f);
+        GameTheme.setPitch(id, 1);
+        GameTheme.setLooping(id, false);
+        System.out.println("hello");
     }
 }

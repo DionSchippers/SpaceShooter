@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class Player {
     int laserTimer;
     Circle c_player;
     Rectangle r_laser;
+    int hp;
 
 
     public void create(String img) {
@@ -33,6 +35,7 @@ public class Player {
         laserTimer = 0;
         c_player = new Circle();
         r_laser = new Rectangle();
+        hp = 3;
     }
 
     public void playerController(float elapsedTime, boolean playing) {
@@ -110,6 +113,15 @@ public class Player {
     public void reset() {
         playerSprite.setX(Gdx.graphics.getWidth()/2 - 48);
         laserSprite.setY(10000);
+        hp = 3;
+    }
+
+    public boolean colWithLaser(Rectangle r_laser) {
+        if (Intersector.overlaps(c_player, r_laser)) {
+            hp--;
+            return true;
+        }
+        return false;
     }
 
 }
