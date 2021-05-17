@@ -13,7 +13,6 @@ import java.util.ArrayList;
 public class AsteroidManager {
     private int numAsteroids;
     private ArrayList<Asteroid> asteroids;
-    int i;
 
     public AsteroidManager(int numAsteroids) {
         this.numAsteroids = numAsteroids;

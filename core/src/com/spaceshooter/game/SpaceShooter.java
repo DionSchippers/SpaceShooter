@@ -58,13 +58,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         screen = "start";
         selectedOption = 0;
         selecting = true;
-//        font = new BitmapFont();
-//        font = new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt"));
-//        Label homescreen = new Label("Space Shooter", new Label.LabelStyle(new BitmapFont(Gdx.files.internal("/fonts/Oxaniumfont.fnt")), Color.MAGENTA));
 
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.local("fonts/Oxaniumfont.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter params = new FreeTypeFontGenerator.FreeTypeFontParameter();
-//        params.borderWidth = 1;
+
         params.borderColor = Color.WHITE;
         params.characters = FreeTypeFontGenerator.DEFAULT_CHARS;
         params.magFilter = Texture.TextureFilter.Nearest;
@@ -364,6 +361,5 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         long id = GameTheme.play(0.5f);
         GameTheme.setPitch(id, 1);
         GameTheme.setLooping(id, false);
-        System.out.println("hello");
     }
 }
