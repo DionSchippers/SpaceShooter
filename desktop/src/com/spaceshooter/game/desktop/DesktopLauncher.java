@@ -13,7 +13,6 @@ public class DesktopLauncher {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		config.setMaximized(true);
 		config.setResizable(false);
-//		config.setWindowSizeLimits(1920, 1080, 1920, 1080);
 		new Lwjgl3Application(new SpaceShooter(), config);
 
 	}
