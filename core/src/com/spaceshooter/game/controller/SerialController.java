@@ -38,7 +38,7 @@ public class SerialController extends BaseController {
                 SerialPort.ONE_STOP_BIT,
                 SerialPort.NO_PARITY
         );
-        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 5000, 5000);
+        this.serialPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_BLOCKING, 100, 100);
         this.inputStream = this.serialPort.getInputStream();
     }
 
