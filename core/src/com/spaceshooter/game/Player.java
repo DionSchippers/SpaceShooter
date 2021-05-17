@@ -81,14 +81,14 @@ public class Player {
             if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
                 playerSprite.setX(Gdx.graphics.getWidth() - 96);
             } else {
-                playerSprite.translateX(8f);
+                playerSprite.translateX(5f);
             }
         }
         if (movingLeft && playing) {
             if (playerSprite.getX() < 0) {
                 playerSprite.setX(0);
             } else {
-                playerSprite.translateX(-8f);
+                playerSprite.translateX(-5f);
             }
         }
     }

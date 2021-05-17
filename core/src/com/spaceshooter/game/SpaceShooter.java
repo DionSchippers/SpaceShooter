@@ -96,9 +96,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             serialController = new SerialController();
             serialController.autoChooseCommPort();
         }
-
-        player = new Player();
-        player.create();
     }
 
     public void updateSerialInput() {
@@ -211,17 +208,18 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             if (keycode == Input.Keys.A)
                 movingLeft = true;
 
-        if (keycode == Input.Keys.D)
-            movingRight = true;
+            if (keycode == Input.Keys.D)
+                movingRight = true;
 
-        if (keycode == Input.Keys.DPAD_LEFT)
-            movingLeft2 = true;
+            if (keycode == Input.Keys.DPAD_LEFT)
+                movingLeft2 = true;
 
-        if (keycode == Input.Keys.DPAD_RIGHT)
-            movingRight2 = true;
+            if (keycode == Input.Keys.DPAD_RIGHT)
+                movingRight2 = true;
 
-        if (keycode == Input.Keys.ENTER)
-            select = true;
+            if (keycode == Input.Keys.ENTER)
+                select = true;
+        }
         return false;
     }
 

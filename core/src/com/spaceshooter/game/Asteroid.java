@@ -75,10 +75,6 @@ public class Asteroid {
         }
     }
 
-    public void destroy() {
-        
-    }
-
     public void explode(float x, float y) {
         explosion.setPosition(x-10, y-10);
         exploding = true;
