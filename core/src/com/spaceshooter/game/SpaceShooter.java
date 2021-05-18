@@ -45,6 +45,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean useKeyboardInput = true;
 
     AsteroidManager asteroidManager;
+    EnemyManager enemyManager;
     BackgroundManager starManager;
     Player player;
     Player player2;
@@ -78,6 +79,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.getData().setScale(1);
         score = 0;
         asteroidManager = new AsteroidManager(8);
+        enemyManager = new EnemyManager(5);
         starManager = new BackgroundManager(100);
         GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
 
@@ -85,8 +87,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         player.create("SpaceShip2.txt");
         player2 = new Player();
         player2.create("SpaceShip4.txt");
-        enemy = new Enemy();
-        enemy.create("SpaceShip4.txt");
         asteroidManager = new AsteroidManager(10);
 
         if (useSerialInput) {
@@ -102,17 +102,14 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 if (direction == 1) {
                     movingRight = true;
                     movingLeft = false;
-                }
-                else if (direction == -1) {
+                } else if (direction == -1) {
                     movingRight = false;
                     movingLeft = true;
-                }
-                else {
+                } else {
                     movingRight = false;
                     movingLeft = false;
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
 
             }
         }
@@ -125,7 +122,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         if (useSerialInput) {
             updateSerialInput();
         }
-        player.move(movingRight, movingLeft, playing);
 
         player.move(movingRight, movingLeft, playing);
         if (playerAmount == 2)
@@ -142,12 +138,13 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             player.playerController(elapsedTime, playing);
             if (playerAmount == 2)
                 player2.playerController(elapsedTime, playing);
-            enemy.enemyController(elapsedTime, playing);
+
+            enemyManager.render(playing, elapsedTime, score, player, player2);
 
             asteroidManager.render(batch, playing, score, elapsedTime);
 
 
-            drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight()/2-20);
+            drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight() / 2 - 20);
             score++;
 
             if (asteroidManager.colWithPlayer(player.c_player) || asteroidManager.colWithPlayer(player2.c_player)) {
@@ -155,14 +152,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 screen = "gameover";
                 GameTheme.stop();
             }
-
-            enemy.hitboxController(player);
-            enemy.hitboxController(player2);
             font.setColor(Color.RED);
             font.draw(batch, Integer.toString(player.hp), 30f, 60f);
             if (playerAmount == 2) {
                 font.setColor(Color.BLUE);
-                font.draw(batch, Integer.toString(player2.hp), Gdx.graphics.getWidth()-30f, 60f);
+                font.draw(batch, Integer.toString(player2.hp), Gdx.graphics.getWidth() - 30f, 60f);
             }
             font.setColor(Color.WHITE);
 
@@ -173,9 +167,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             }
 
 
-            score += player.hitboxController(asteroidManager);
+            score += player.hitboxController(asteroidManager, enemyManager);
             if (playerAmount == 2)
-                score += player2.hitboxController(asteroidManager);
+                score += player2.hitboxController(asteroidManager, enemyManager);
 
         } else if (screen == "gameover") {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
@@ -357,6 +351,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         }
 
     }
+
     public void playMusic() {
         long id = GameTheme.play(0.5f);
         GameTheme.setPitch(id, 1);

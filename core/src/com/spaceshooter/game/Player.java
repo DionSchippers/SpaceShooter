@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
@@ -61,12 +60,18 @@ public class Player {
         batch.end();
     }
 
-    public int hitboxController(AsteroidManager asteroidManager) {
+    public int hitboxController(AsteroidManager asteroidManager, EnemyManager enemyManager) {
         if (asteroidManager.colWithLaser(r_laser)) {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
             laserSprite.setPosition(laserSprite.getX(), 10000f);
             return 1000;
+        }
+        if (enemyManager.colWithLaser(r_laser)) {
+            laserList.remove(laserSprite);
+            laserSprite.setAlpha(0);
+            laserSprite.setPosition(laserSprite.getX(), 10000f);
+            return 5000;
         }
         return 0;
     }
@@ -81,14 +86,14 @@ public class Player {
             if (playerSprite.getX() > Gdx.graphics.getWidth() - 96) {
                 playerSprite.setX(Gdx.graphics.getWidth() - 96);
             } else {
-                playerSprite.translateX(5f);
+                playerSprite.translateX(7f);
             }
         }
         if (movingLeft && playing) {
             if (playerSprite.getX() < 0) {
                 playerSprite.setX(0);
             } else {
-                playerSprite.translateX(-5f);
+                playerSprite.translateX(-7f);
             }
         }
     }
@@ -128,5 +133,7 @@ public class Player {
         }
         return false;
     }
+
+
 
 }
