@@ -334,6 +334,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 asteroidManager.reset();
                 screen = "game";
                 score = 0;
+                enemyManager.resetScore();
                 playMusic();
                 playing = true;
                 player.reset();
@@ -347,6 +348,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                     player2.reset();
                 asteroidManager.reset();
                 score = 0;
+                enemyManager.resetScore();
                 break;
         }
 

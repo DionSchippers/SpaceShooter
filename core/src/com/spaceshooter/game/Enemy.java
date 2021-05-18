@@ -34,7 +34,7 @@ public class Enemy {
     public Enemy(String img) {
         batch = new SpriteBatch();
         enemyTexture = new TextureAtlas(img);
-        laserImg = new Texture("laserbeam1.png");
+        laserImg = new Texture("EnemyLaser.png");
         enemyAnimation = new Animation(1f / 30f, enemyTexture.getRegions());
         laserList = new ArrayList<>();
         enemySprite = new Sprite();

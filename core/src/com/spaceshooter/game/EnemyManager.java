@@ -65,6 +65,9 @@ public class EnemyManager {
         return false;
     }
 
+    public void resetScore() {
+        scoreAmount = 0;
+    }
 
 }
 
