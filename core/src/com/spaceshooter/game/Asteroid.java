@@ -76,7 +76,7 @@ public class Asteroid {
     }
 
     public void explode(float x, float y) {
-        explosion.setPosition(x-10, y-10);
+        explosion.setPosition(x - 10, y - 10);
         exploding = true;
         time = 1;
         long id = explosionSound.play(0.5f);
@@ -86,13 +86,17 @@ public class Asteroid {
     }
 
     public void destroy() {
-        
+
     }
 
     public Sprite getSprite() {
         return this.sprite;
     }
-    public float getY() { return sprite.getY();}
+
+    public float getY() {
+        return sprite.getY();
+    }
+
     public Sprite getExplosion() {
         return this.explosion;
     }
