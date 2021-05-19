@@ -31,7 +31,7 @@ public class Player {
         batch = new SpriteBatch();
         playerTexture = new TextureAtlas(img);
         laserImg = new Texture("laserbeam1.png");
-        playerAnimation = new Animation(1f/30f, playerTexture.getRegions());
+        playerAnimation = new Animation(1f / 30f, playerTexture.getRegions());
         laserList = new ArrayList<>();
         playerSprite = new Sprite();
         playerSprite.setPosition(Gdx.graphics.getWidth() / 2 - playerSprite.getWidth() / 2, 20);
@@ -104,12 +104,12 @@ public class Player {
             laserSprite.setAlpha(0);
         } else if (playing) {
             laserSprite.translateY(50f);
-            r_laser.setPosition(laserSprite.getX(),laserSprite.getY());
+            r_laser.setPosition(laserSprite.getX(), laserSprite.getY());
         }
         laserTimer++;
         while (laserTimer > 20) {
             createLaser(playerSprite.getX());
-            r_laser.set(laserSprite.getX()-laserSprite.getWidth()/2, laserSprite.getY()-laserSprite.getHeight()/2, laserSprite.getWidth(), laserSprite.getHeight());
+            r_laser.set(laserSprite.getX() - laserSprite.getWidth() / 2, laserSprite.getY() - laserSprite.getHeight() / 2, laserSprite.getWidth(), laserSprite.getHeight());
             laserTimer = 0;
         }
     }
@@ -121,7 +121,7 @@ public class Player {
     }
 
     public void reset() {
-        playerSprite.setX(Gdx.graphics.getWidth()/2 - 48);
+        playerSprite.setX(Gdx.graphics.getWidth() / 2 - 48);
         laserSprite.setY(10000);
         hp = 3;
     }

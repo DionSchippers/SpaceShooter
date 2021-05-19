@@ -17,6 +17,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.spaceshooter.game.controller.SerialController;
+import com.sun.java.swing.action.ExitAction;
+import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
 
 import java.io.IOException;
 
@@ -174,11 +176,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         } else if (screen == "gameover") {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
             drawCenterText(font, "Game Over", 50);
-            menuSelector("Restart", "Menu");
+            menuSelector("Restart", "Menu", "Afsluiten"); //Stan
 
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
-            menuSelector("1 speler", "2 spelers");
+            menuSelector("1 speler", "2 spelers", "Afsluiten"); //Stan
         }
 
         batch.end();
@@ -280,7 +282,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.draw(batch, layout, fontX, fontY);
     }
 
-    public void menuSelector(String option1, String option2) {
+    public void menuSelector(String option1, String option2, String option3) { //Stan
         font.setColor(Color.GRAY);
         if (movingLeft && selecting || movingLeft2 && selecting) {
             selectedOption--;
@@ -290,8 +292,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             selectedOption++;
             selecting = false;
         }
-        if (selectedOption > 1) selectedOption = 0;
-        if (selectedOption < 0) selectedOption = 1;
+        if (selectedOption > 2) selectedOption = 0;
+        if (selectedOption < 0) selectedOption = 2;
 
         if (selectedOption == 0)
             font.setColor(Color.WHITE);
@@ -301,6 +303,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         if (selectedOption == 1)
             font.setColor(Color.WHITE);
         drawCenterText(font, option2, -80);
+        font.setColor(Color.GRAY);
+
+        if (selectedOption == 2)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option3, -120);
         font.setColor(Color.WHITE);
 
         if (select && selecting) {
@@ -309,8 +316,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 options(option1);
             } else if (selectedOption == 1) {
                 options(option2);
+            } else if (selectedOption == 2) {
+                options(option3);
             }
-            selectedOption = 0;
         }
 
     }
@@ -348,8 +356,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 asteroidManager.reset();
                 score = 0;
                 break;
+            case "Afsluiten":
+                screen = "game";
+                System.exit(0);
+                break;
         }
-
     }
 
     public void playMusic() {

@@ -14,6 +14,5 @@ public class DesktopLauncher {
 		config.setMaximized(true);
 		config.setResizable(false);
 		new Lwjgl3Application(new SpaceShooter(), config);
-
 	}
 }
