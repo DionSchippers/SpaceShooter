@@ -1,6 +1,7 @@
 package com.spaceshooter.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Circle;
@@ -25,6 +26,7 @@ public class Player {
     Circle c_player;
     Rectangle r_laser;
     int hp;
+    Sound damageSound;
 
 
     public void create(String img) {
@@ -40,6 +42,7 @@ public class Player {
         c_player = new Circle();
         r_laser = new Rectangle();
         hp = 3;
+        damageSound= Gdx.audio.newSound(Gdx.files.internal("PlayerDmg.ogg"));
     }
 
     public void playerController(float elapsedTime, boolean playing) {
@@ -71,7 +74,7 @@ public class Player {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
             laserSprite.setPosition(laserSprite.getX(), 10000f);
-            return 5000;
+            return 2000;
         }
         return 0;
     }
@@ -129,6 +132,9 @@ public class Player {
     public boolean colWithLaser(Rectangle r_laser) {
         if (Intersector.overlaps(c_player, r_laser)) {
             hp--;
+            long id = damageSound.play(0.5f);
+            damageSound.setPitch(id, 1);
+            damageSound.setLooping(id, false);
             return true;
         }
         return false;
