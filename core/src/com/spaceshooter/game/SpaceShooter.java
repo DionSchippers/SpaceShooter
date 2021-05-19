@@ -43,8 +43,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Sound GameTheme;
 
     SerialController serialController = null;
-    boolean useSerialInput = true;
-    boolean useKeyboardInput = false;
+    boolean useSerialInput = false;
+    boolean useKeyboardInput = true;
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
