@@ -7,25 +7,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
 import com.spaceshooter.game.controller.SerialController;
-import com.sun.java.swing.action.ExitAction;
-import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
+
 
 import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
-    Texture enemyImg;
-    Sprite enemySprite;
     boolean movingRight = false;
     boolean movingLeft = false;
     boolean movingRight2 = false;
@@ -49,6 +37,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
+    PowerupManager powerupManager;
     BackgroundManager starManager;
     Player player;
     Player player2;
@@ -81,7 +70,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.setColor(Color.WHITE);
         font.getData().setScale(1);
         score = 0;
-        asteroidManager = new AsteroidManager(8);
+//        asteroidManager = new AsteroidManager(8);
         enemyManager = new EnemyManager(0);
         starManager = new BackgroundManager(100);
         GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
@@ -91,6 +80,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         player2 = new Player();
         player2.create("SpaceShip4.txt");
         asteroidManager = new AsteroidManager(10);
+        powerupManager = new PowerupManager(0);
 
         if (useSerialInput) {
             serialController = new SerialController();
@@ -145,13 +135,15 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             enemyManager.render(playing, elapsedTime, score, player, player2);
 
             asteroidManager.render(batch, playing, score, elapsedTime);
+            powerupManager.render(batch, playing, score, elapsedTime);
 
             if (!versus) {
                 drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight() / 2 - 20);
                 score++;
-                score += player.hitboxController(asteroidManager, enemyManager);
+                score += player.hitboxController(asteroidManager, enemyManager, powerupManager);
                 if (playerAmount == 2)
-                    score += player2.hitboxController(asteroidManager, enemyManager);
+                    score += player2.hitboxController(asteroidManager, enemyManager, powerupManager);
+
                 if (player.hp < 1 || player2.hp < 1) {
                     playing = false;
                     screen = "gameover";
@@ -165,8 +157,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 font.draw(batch, layout, fontX, fontY);
                 player.score++;
                 player2.score++;
-                player.score += player.hitboxController(asteroidManager, enemyManager);
-                player2.score += player2.hitboxController(asteroidManager, enemyManager);
+                player.score += player.hitboxController(asteroidManager, enemyManager, powerupManager);
+                player2.score += player2.hitboxController(asteroidManager, enemyManager, powerupManager);
                 score = (player.score + player2.score) /2;
                 if (player.hp < 1 && player2.hp < 1) {
                     playing = false;
@@ -181,10 +173,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 }
             }
 
-            if (asteroidManager.colWithPlayer(player.c_player)) {
+            if (asteroidManager.colWithPlayer(player.c_player) || powerupManager.colWithPlayer(player.c_player)) {
                 player.hp = 0;
             }
-            if (asteroidManager.colWithPlayer(player2.c_player)) {
+            if (asteroidManager.colWithPlayer(player2.c_player) || powerupManager.colWithPlayer(player2.c_player)) {
                 player2.hp = 0;
             }
 
@@ -217,7 +209,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             drawCenterText(font, "Select gamemode", 50);
             menuSelector("Co-op", "Versus", "Menu");
         }
-
         batch.end();
     }
 
@@ -389,6 +380,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 break;
             case "Restart":
                 asteroidManager.reset();
+                powerupManager.reset();
                 screen = "game";
                 score = 0;
                 enemyManager.resetEnemy();
@@ -404,6 +396,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 if (playerAmount == 2)
                     player2.reset();
                 asteroidManager.reset();
+                powerupManager.reset();
                 score = 0;
                 enemyManager.resetEnemy();
                 break;
