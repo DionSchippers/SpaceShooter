@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class EnemyManager {
     private int numEnemies;
     private ArrayList<Enemy> enemies;
-    private int scoreAmount = 0;
+    private int scoreAmount = 10000;
 
     public EnemyManager(int numEnemies) {
         this.numEnemies = numEnemies;
@@ -30,7 +30,7 @@ public class EnemyManager {
             if (scoreAmount < score) {
                 System.out.println(scoreAmount);
                 this.enemies.add(new Enemy("EnemyShip.txt"));
-                scoreAmount += 20000;
+                scoreAmount += 10000;
             }
             for (Enemy enemy : enemies) {
                 enemy.enemyController(elapsedTime, playing);
@@ -59,14 +59,16 @@ public class EnemyManager {
                 enemy.enemySprite.setPosition(enemy.enemySprite.getX(), -100);
                 enemy.laserSprite.setPosition(enemy.enemySprite.getX(), -100);
                 enemy.c_player.setPosition(enemy.enemySprite.getX(), -100);
+                enemies.remove(enemy);
                 return true;
             }
         }
         return false;
     }
 
-    public void resetScore() {
-        scoreAmount = 0;
+    public void resetEnemy() {
+        enemies.clear();
+        scoreAmount = 10000;
     }
 
 }

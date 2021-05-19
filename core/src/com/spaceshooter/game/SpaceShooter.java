@@ -79,7 +79,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.getData().setScale(1);
         score = 0;
         asteroidManager = new AsteroidManager(8);
-        enemyManager = new EnemyManager(5);
+        enemyManager = new EnemyManager(0);
         starManager = new BackgroundManager(100);
         GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
 
@@ -334,7 +334,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 asteroidManager.reset();
                 screen = "game";
                 score = 0;
-                enemyManager.resetScore();
+                enemyManager.resetEnemy();
                 playMusic();
                 playing = true;
                 player.reset();
@@ -348,7 +348,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                     player2.reset();
                 asteroidManager.reset();
                 score = 0;
-                enemyManager.resetScore();
+                enemyManager.resetEnemy();
                 break;
         }
 
