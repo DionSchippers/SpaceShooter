@@ -179,11 +179,11 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         } else if (screen == "gameover") {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
             drawCenterText(font, "Game Over", 50);
-            menuSelector("Restart", "Menu", "Afsluiten"); //Stan
+            menuSelector("Restart", "Menu", "Afsluiten");
 
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
-            menuSelector("1 speler", "2 spelers", "Afsluiten"); //Stan
+            menuSelector("1 speler", "2 spelers", "Afsluiten");
         }
 
         batch.end();
@@ -285,7 +285,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.draw(batch, layout, fontX, fontY);
     }
 
-    public void menuSelector(String option1, String option2, String option3) { //Stan
+    public void menuSelector(String option1, String option2, String option3) {
         font.setColor(Color.GRAY);
         if (movingLeft && selecting || movingLeft2 && selecting) {
             selectedOption--;
@@ -322,6 +322,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             } else if (selectedOption == 2) {
                 options(option3);
             }
+            selectedOption = 0;
         }
 
     }
