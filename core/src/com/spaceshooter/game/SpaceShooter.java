@@ -16,6 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
 import com.spaceshooter.game.controller.SerialController;
 import com.sun.java.swing.action.ExitAction;
 import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
@@ -176,11 +178,17 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         } else if (screen == "gameover") {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
             drawCenterText(font, "Game Over", 50);
-            menuSelector("Restart", "Menu", "Afsluiten");
+            menuSelector("Restart", "Menu", "Leaderboard");
 
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
             menuSelector("1 speler", "2 spelers", "Afsluiten");
+        } else if (screen == "leaderboard") {
+            drawCenterText(fonttitle, "Leaderboard", 110);
+            Json test = new Json();
+            String json = test.toJson(score);
+            drawCenterText(font, json, 50);
+            menuSelector("Afsluiten");
         }
 
         batch.end();
@@ -324,51 +332,85 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     }
 
-    public void options(String option) {
-        switch (option) {
-            case "1 speler":
-                playerAmount = 1;
-                screen = "game";
-                playing = true;
-                playMusic();
-                break;
+    public void menuSelector(String option1) {
+        font.setColor(Color.GRAY);
+        if (movingLeft && selecting || movingLeft2 && selecting) {
+            selectedOption--;
+            selecting = false;
+        }
+        if (movingRight && selecting || movingRight2 && selecting) {
+            selectedOption++;
+            selecting = false;
+        }
+        if (selectedOption > 1) selectedOption = 0;
+        if (selectedOption < 0) selectedOption = 1;
 
-            case "2 spelers":
-                playerAmount = 2;
-                screen = "game";
-                playing = true;
-                playMusic();
-                break;
-            case "Restart":
-                asteroidManager.reset();
-                screen = "game";
-                score = 0;
-                enemyManager.resetEnemy();
-                playMusic();
-                playing = true;
-                player.reset();
-                if (playerAmount == 2)
-                    player2.reset();
-                break;
-            case "Menu":
-                screen = "start";
-                player.reset();
-                if (playerAmount == 2)
-                    player2.reset();
-                asteroidManager.reset();
-                score = 0;
-                enemyManager.resetEnemy();
-                break;
-            case "Afsluiten":
-                screen = "game";
-                System.exit(0);
-                break;
+        if (selectedOption == 0)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option1, -40);
+        font.setColor(Color.GRAY);
+
+        if (select && selecting) {
+            selecting = false;
+            if (selectedOption == 0) {
+                options(option1);
+            }
+            selectedOption = 0;
         }
     }
+        public void options (String option){
+            switch (option) {
+                case "1 speler":
+                    playerAmount = 1;
+                    screen = "game";
+                    playing = true;
+                    playMusic();
+                    break;
 
-    public void playMusic() {
-        long id = GameTheme.play(0.5f);
-        GameTheme.setPitch(id, 1);
-        GameTheme.setLooping(id, false);
+                case "2 spelers":
+                    playerAmount = 2;
+                    screen = "game";
+                    playing = true;
+                    playMusic();
+                    break;
+                case "Restart":
+                    asteroidManager.reset();
+                    screen = "game";
+                    score = 0;
+                    enemyManager.resetEnemy();
+                    playMusic();
+                    playing = true;
+                    player.reset();
+                    if (playerAmount == 2)
+                        player2.reset();
+                    break;
+                case "Menu":
+                    screen = "start";
+                    player.reset();
+                    if (playerAmount == 2)
+                        player2.reset();
+                    asteroidManager.reset();
+                    score = 0;
+                    enemyManager.resetEnemy();
+                    break;
+                case "Afsluiten":
+                    screen = "game";
+                    System.exit(0);
+                    break;
+                case "Leaderboard":
+                    screen = "leaderboard";
+                    // TODO: 19-May-21
+                    break;
+            }
+        }
+
+        public void playMusic () {
+            long id = GameTheme.play(0.5f);
+            GameTheme.setPitch(id, 1);
+            GameTheme.setLooping(id, false);
+        }
+
+        public void leadboard () {
+
+        }
     }
-}
