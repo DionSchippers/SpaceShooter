@@ -308,7 +308,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.draw(batch, layout, fontX, fontY);
     }
 
-    public void menuSelector(String option1, String option2, String option3) { //Stan
+    public void menuSelector(String option1, String option2, String option3) {
         font.setColor(Color.GRAY);
         if (movingLeft && selecting || movingLeft2 && selecting) {
             selectedOption--;
@@ -345,6 +345,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             } else if (selectedOption == 2) {
                 options(option3);
             }
+            selectedOption = 0;
         }
 
     }
