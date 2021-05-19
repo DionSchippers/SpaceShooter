@@ -40,6 +40,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int selectedOption;
     boolean selecting;
     int playerAmount;
+    boolean versus = false;
     Sound GameTheme;
 
     SerialController serialController = null;
@@ -145,15 +146,48 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
             asteroidManager.render(batch, playing, score, elapsedTime);
 
-
-            drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight() / 2 - 20);
-            score++;
-
-            if (asteroidManager.colWithPlayer(player.c_player) || asteroidManager.colWithPlayer(player2.c_player)) {
-                playing = false;
-                screen = "gameover";
-                GameTheme.stop();
+            if (!versus) {
+                drawCenterText(font, Integer.toString(score), Gdx.graphics.getHeight() / 2 - 20);
+                score++;
+                score += player.hitboxController(asteroidManager, enemyManager);
+                if (playerAmount == 2)
+                    score += player2.hitboxController(asteroidManager, enemyManager);
+                if (player.hp < 1 || player2.hp < 1) {
+                    playing = false;
+                    screen = "gameover";
+                    GameTheme.stop();
+                }
+            } else {
+                font.draw(batch, Integer.toString(player.score), 20f, Gdx.graphics.getHeight()-20f);
+                GlyphLayout layout = new GlyphLayout(font, Integer.toString(player2.score));
+                float fontX = (Gdx.graphics.getWidth() - layout.width)-20f;
+                float fontY = (Gdx.graphics.getHeight()-20f);
+                font.draw(batch, layout, fontX, fontY);
+                player.score++;
+                player2.score++;
+                player.score += player.hitboxController(asteroidManager, enemyManager);
+                player2.score += player2.hitboxController(asteroidManager, enemyManager);
+                score = (player.score + player2.score) /2;
+                if (player.hp < 1 && player2.hp < 1) {
+                    playing = false;
+                    screen = "gameover";
+                    GameTheme.stop();
+                }
+                if (player.hp < 1) {
+                    player.dead = true;
+                }
+                if (player2.hp < 1) {
+                    player2.dead = true;
+                }
             }
+
+            if (asteroidManager.colWithPlayer(player.c_player)) {
+                player.hp = 0;
+            }
+            if (asteroidManager.colWithPlayer(player2.c_player)) {
+                player2.hp = 0;
+            }
+
             font.setColor(Color.RED);
             font.draw(batch, Integer.toString(player.hp), 30f, 60f);
             if (playerAmount == 2) {
@@ -162,25 +196,26 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             }
             font.setColor(Color.WHITE);
 
-            if (player.hp < 1 || player2.hp < 1) {
-                playing = false;
-                screen = "gameover";
-                GameTheme.stop();
-            }
-
-
-            score += player.hitboxController(asteroidManager, enemyManager);
-            if (playerAmount == 2)
-                score += player2.hitboxController(asteroidManager, enemyManager);
-
         } else if (screen == "gameover") {
-            drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
-            drawCenterText(font, "Game Over", 50);
-            menuSelector("Restart", "Menu", "Afsluiten"); //Stan
-
+            if (!versus) {
+                drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
+            } else {
+                if (player.score > player2.score) {
+                    drawCenterText(font, "Speler 1 heeft gewonnen met " + Integer.toString(player.score) + " punten!", 50);
+                    drawCenterText(font, "Speler 2 heeft " + Integer.toString(player2.score) + " punten gehaald!", 10);
+                } else if (player.score < player2.score) {
+                    drawCenterText(font, "Speler 2 heeft gewonnen met " + Integer.toString(player2.score) + " punten!", 50);
+                    drawCenterText(font, "Speler 1 heeft " + Integer.toString(player.score) + " punten gehaald!", 10);
+                }
+            }
+            drawCenterText(font, "Game Over", 100);
+            menuSelector("Restart", "Menu", "Afsluiten");
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
-            menuSelector("1 speler", "2 spelers", "Afsluiten"); //Stan
+            menuSelector("1 speler", "2 spelers", "Afsluiten");
+        } else if (screen == "multiselect") {
+            drawCenterText(font, "Select gamemode", 50);
+            menuSelector("Co-op", "Versus", "Menu");
         }
 
         batch.end();
@@ -329,14 +364,28 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 playerAmount = 1;
                 screen = "game";
                 playing = true;
+                versus = false;
+                player.dead = false;
                 playMusic();
                 break;
-
             case "2 spelers":
+                screen = "multiselect";
+                break;
+            case "Co-op":
                 playerAmount = 2;
                 screen = "game";
                 playing = true;
+                versus = false;
+                player.dead = false;
                 playMusic();
+                break;
+            case "Versus":
+                playerAmount = 2;
+                screen = "game";
+                playing = true;
+                versus = true;
+                playMusic();
+                player.dead = false;
                 break;
             case "Restart":
                 asteroidManager.reset();

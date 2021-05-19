@@ -27,6 +27,8 @@ public class Player {
     Rectangle r_laser;
     int hp;
     Sound damageSound;
+    int score = 0;
+    boolean dead = false;
 
 
     public void create(String img) {
@@ -47,19 +49,19 @@ public class Player {
 
     public void playerController(float elapsedTime, boolean playing) {
         batch.begin();
-        for (Sprite sprite : laserList) {
-            sprite.draw(batch);
+        if (!dead) {
+            for (Sprite sprite : laserList) {
+                sprite.draw(batch);
+            }
+
+            batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
+
+            lasercontroller(playing);
+
+            float x = playerSprite.getX();
+            float y = playerSprite.getY();
+            c_player.set(x + 48, y + 48, 48);
         }
-
-        batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
-
-        lasercontroller(playing);
-
-        float x = playerSprite.getX();
-        float y = playerSprite.getY();
-        c_player.set(x + 48, y + 48, 48);
-
-
         batch.end();
     }
 
@@ -127,6 +129,8 @@ public class Player {
         playerSprite.setX(Gdx.graphics.getWidth() / 2 - 48);
         laserSprite.setY(10000);
         hp = 3;
+        score = 0;
+        dead = false;
     }
 
     public boolean colWithLaser(Rectangle r_laser) {
