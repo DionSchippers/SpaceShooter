@@ -14,8 +14,11 @@ void loop() {
   if (digitalRead(2) == LOW && digitalRead(3) == HIGH) {
     Serial.write("R");
   }
-  if (digitalRead(2) == HIGH && digitalRead(3) == LOW) {
+  else if (digitalRead(2) == HIGH && digitalRead(3) == LOW) {
     Serial.write("L");
+  }
+  else {
+    Serial.write("0");
   }
 
   delay(16);
