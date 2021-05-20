@@ -53,7 +53,7 @@ public class Powerup {
         c_powerup = new Circle();
         exploding = false;
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
-        type = ThreadLocalRandom.current().nextInt(1, 1 + 1);
+        type = ThreadLocalRandom.current().nextInt(1, 2 + 1);
     }
 
     public Powerup() {

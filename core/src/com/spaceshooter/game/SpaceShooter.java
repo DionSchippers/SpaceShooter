@@ -155,11 +155,21 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 float fontX = (Gdx.graphics.getWidth() - layout.width)-20f;
                 float fontY = (Gdx.graphics.getHeight()-20f);
                 font.draw(batch, layout, fontX, fontY);
-                player.score++;
-                player2.score++;
-                player.score += player.hitboxController(asteroidManager, enemyManager, powerupManager);
-                player2.score += player2.hitboxController(asteroidManager, enemyManager, powerupManager);
-                score = (player.score + player2.score) /2;
+                if (!player.dead) {
+                    player.score++;
+                    player.score += player.hitboxController(asteroidManager, enemyManager, powerupManager);
+                }
+                if (!player2.dead) {
+                    player2.score++;
+                    player2.score += player2.hitboxController(asteroidManager, enemyManager, powerupManager);
+                }
+                if (!player.dead && !player2.dead) {
+                    score = (player.score + player2.score) / 2;
+                } else if (!player.dead && player2.dead) {
+                    score = (player.score);
+                } else if (player.dead && !player2.dead) {
+                    score = (player2.score);
+                }
                 if (player.hp < 1 && player2.hp < 1) {
                     playing = false;
                     screen = "gameover";

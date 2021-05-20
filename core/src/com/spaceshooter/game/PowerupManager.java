@@ -52,6 +52,7 @@ public class PowerupManager {
 
     public void reset() {
         powerups.clear();
+        scoreAmount = 5000;
     }
 
     public boolean colWithPlayer(Circle c_player) {

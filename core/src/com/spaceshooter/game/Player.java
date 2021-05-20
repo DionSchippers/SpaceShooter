@@ -17,34 +17,29 @@ import java.util.ArrayList;
 public class Player {
     SpriteBatch batch;
     TextureAtlas playerTexture;
-    Texture laserImg;
     Sprite playerSprite;
-    Sprite laserSprite;
     Animation<TextureRegion> playerAnimation;
-    ArrayList<Sprite> laserList;
+    ArrayList<Laser> laserList;
     int laserTimer;
     Circle c_player;
-    Rectangle r_laser;
     int hp;
     Sound damageSound;
     int score = 0;
     boolean dead = false;
     int powerup = 0;
     float bulletspeed = 50f;
+    int tpr = 20;
 
 
     public void create(String img) {
         batch = new SpriteBatch();
         playerTexture = new TextureAtlas(img);
-        laserImg = new Texture("laserbeam1.png");
         playerAnimation = new Animation(1f / 30f, playerTexture.getRegions());
-        laserList = new ArrayList<>();
+        laserList = new ArrayList<Laser>();
         playerSprite = new Sprite();
         playerSprite.setPosition(Gdx.graphics.getWidth() / 2 - playerSprite.getWidth() / 2, 20);
-        createLaser(playerSprite.getX());
         laserTimer = 0;
         c_player = new Circle();
-        r_laser = new Rectangle();
         hp = 3;
         damageSound= Gdx.audio.newSound(Gdx.files.internal("PlayerDmg.ogg"));
     }
@@ -52,8 +47,8 @@ public class Player {
     public void playerController(float elapsedTime, boolean playing) {
         batch.begin();
         if (!dead) {
-            for (Sprite sprite : laserList) {
-                sprite.draw(batch);
+            for (Laser laser : laserList) {
+                laser.laserSprite.draw(batch);
             }
 
             batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
@@ -76,30 +71,32 @@ public class Player {
     }
 
     public int hitboxController(AsteroidManager asteroidManager, EnemyManager enemyManager, PowerupManager powerupManager) {
-        if (asteroidManager.colWithLaser(r_laser)) {
-            laserList.remove(laserSprite);
-            laserSprite.setAlpha(0);
-            laserSprite.setPosition(laserSprite.getX(), 10000f);
-            return 1000;
+        int points = 0;
+        for (Laser laser: laserList) {
+            if (asteroidManager.colWithLaser(laser.r_laser)) {
+                laserList.remove(laser.laserSprite);
+                laser.reset();
+                points += 1000;
+            }
+            if (enemyManager.colWithLaser(laser.r_laser)) {
+                laserList.remove(laser.laserSprite);
+                laser.reset();
+                points += 2000;
+            }
+            if (powerupManager.colWithLaser(laser.r_laser, this)) {
+                laserList.remove(laser.laserSprite);
+                laser.reset();
+                points += 2000;
+            }
         }
-        if (enemyManager.colWithLaser(r_laser)) {
-            laserList.remove(laserSprite);
-            laserSprite.setAlpha(0);
-            laserSprite.setPosition(laserSprite.getX(), 10000f);
-            return 2000;
-        }
-        if (powerupManager.colWithLaser(r_laser, this)) {
-            laserList.remove(laserSprite);
-            laserSprite.setAlpha(0);
-            laserSprite.setPosition(laserSprite.getX(), 10000f);
-            return 2000;
-        }
-        return 0;
+        return points;
     }
 
     public void dispose() {
         playerTexture.dispose();
-        laserImg.dispose();
+        for (Laser laser: laserList) {
+            laser.laserImg.dispose();
+        }
     }
 
     public void move(boolean movingRight, boolean movingLeft, boolean playing) {
@@ -120,46 +117,64 @@ public class Player {
     }
 
     public void lasercontroller(boolean playing) {
-        if (laserSprite.getY() > Gdx.graphics.getHeight()) {
-            laserList.remove(laserSprite);
-            laserSprite.setAlpha(0);
-        } else if (playing) {
-            laserSprite.translateY(bulletspeed);
-            r_laser.setPosition(laserSprite.getX(), laserSprite.getY());
+        for (Laser laser: laserList) {
+            laser.lasercontroller(playing);
+            System.out.println("hallo");
         }
-        laserTimer++;
+        while (laserTimer > tpr) {
+            switch (powerup){
+                case 0:
+                    laserList.add(new Laser(0f, 50f, "laserBeam1.png", playerSprite.getX()));
+                    tpr = 20;
+                    break;
+                case 1:
+                    laserList.add(new Laser(0f, 50f, "laserBeam1.png", playerSprite.getX()));
+                    tpr = 5;
+                    break;
+                case 2:
+                    laserList.add(new Laser(2f, 20f, "laserBeam1.png", playerSprite.getX()));
+                    laserList.add(new Laser(0f, 20f, "laserBeam1.png", playerSprite.getX()));
+                    laserList.add(new Laser(-2f, 20f, "laserBeam1.png", playerSprite.getX()));
+                    tpr = 80;
+                    break;
+            }
+            laserTimer = 0;
+        }
+
         if (powerup == 0 || powerup == 1) {
             while (laserTimer > 21 - (bulletspeed / 50)) {
-                createLaser(playerSprite.getX());
-                r_laser.set(laserSprite.getX() - laserSprite.getWidth() / 2, laserSprite.getY() - laserSprite.getHeight() * 1.5f, laserSprite.getWidth(), laserSprite.getHeight() * 3);
+                laserList.add(new Laser(0f, 50f, "laserBeam1.png", playerSprite.getX()));
                 laserTimer = 0;
             }
         } else if (powerup == 2) {
 
         }
+        laserTimer++;
+        System.out.println(laserTimer);
     }
 
-    public void createLaser(float playerSpriteX) {
-        laserSprite = new Sprite(laserImg);
-        laserSprite.setPosition(playerSpriteX + 32, 52);
-        laserList.add(laserSprite);
-    }
 
     public void reset() {
         playerSprite.setX(Gdx.graphics.getWidth() / 2 - 48);
-        laserSprite.setY(10000);
         hp = 3;
         score = 0;
         dead = false;
+        for (Laser laser: laserList) {
+            laser.laserSprite.setY(10000);
+        }
+        powerup = 0;
+        laserList.clear();
     }
 
     public boolean colWithLaser(Rectangle r_laser) {
-        if (Intersector.overlaps(c_player, r_laser)) {
-            hp--;
-            long id = damageSound.play(0.5f);
-            damageSound.setPitch(id, 1);
-            damageSound.setLooping(id, false);
-            return true;
+        if (!dead) {
+            if (Intersector.overlaps(c_player, r_laser)) {
+                hp--;
+                long id = damageSound.play(0.5f);
+                damageSound.setPitch(id, 1);
+                damageSound.setLooping(id, false);
+                return true;
+            }
         }
         return false;
     }
