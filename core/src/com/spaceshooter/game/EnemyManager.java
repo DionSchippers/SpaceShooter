@@ -25,10 +25,7 @@ public class EnemyManager {
 
     public void render(boolean playing, float elapsedTime, int score, Player player, Player player2) {
         if (playing) {
-            System.out.println(score);
-            System.out.println(scoreAmount);
             if (scoreAmount < score) {
-                System.out.println(scoreAmount);
                 this.enemies.add(new Enemy("EnemyShip.txt"));
                 scoreAmount += 10000;
             }

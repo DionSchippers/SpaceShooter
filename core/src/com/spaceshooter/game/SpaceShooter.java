@@ -1,28 +1,28 @@
 package com.spaceshooter.game;
 
-import com.badlogic.gdx.*;
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
+import com.spaceshooter.game.controller.BaseController;
 import com.spaceshooter.game.controller.SerialController;
-import com.sun.java.swing.action.ExitAction;
-import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
+import com.spaceshooter.game.controller.SocketController;
 
 import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
+    final String socketControllerIp = "127.0.0.1";
+    final int socketControllerPort = 42420;
+
     SpriteBatch batch;
     Texture enemyImg;
     Sprite enemySprite;
@@ -42,9 +42,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int playerAmount;
     Sound GameTheme;
 
-    SerialController serialController = null;
-    boolean useSerialInput = false;
-    boolean useKeyboardInput = true;
+    BaseController controller;
+    InputMethod inputMethod = InputMethod.SOCKET;
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
@@ -52,7 +51,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Player player;
     Player player2;
     Enemy enemy;
-
 
     @Override
     public void create() {
@@ -91,16 +89,34 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         player2.create("SpaceShip4.txt");
         asteroidManager = new AsteroidManager(10);
 
-        if (useSerialInput) {
-            serialController = new SerialController();
-            serialController.autoChooseCommPort();
+        this.initializeController();
+    }
+
+    public void initializeController() {
+        switch (inputMethod) {
+            case SERIAL:
+                // Initialize the serial controller
+                SerialController serialController = new SerialController();
+                serialController.autoChooseCommPort();
+
+                // The program may now use the controller's getDirection()
+                this.controller = serialController;
+                break;
+
+            case SOCKET:
+                // The program may now use the controller's getDirection()
+                this.controller = new SocketController(socketControllerIp, socketControllerPort);
+                break;
+
+            default:
+                return;
         }
     }
 
-    public void updateSerialInput() {
-        if (serialController != null) {
+    public void updateControllerInput() {
+        if (this.controller != null) {
             try {
-                int direction = serialController.getDirection();
+                int direction = this.controller.getDirection();
                 if (direction == 1) {
                     movingRight = true;
                     movingLeft = false;
@@ -121,8 +137,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     public void render() {
         elapsedTime += Gdx.graphics.getDeltaTime();
 
-        if (useSerialInput) {
-            updateSerialInput();
+        if (inputMethod.equals(InputMethod.SOCKET) || inputMethod.equals(InputMethod.SERIAL)) {
+            updateControllerInput();
         }
 
         player.move(movingRight, movingLeft, playing);
@@ -197,22 +213,20 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (useKeyboardInput) {
-            if (keycode == Input.Keys.A)
-                movingLeft = true;
+        if (keycode == Input.Keys.A)
+            movingLeft = true;
 
-            if (keycode == Input.Keys.D)
-                movingRight = true;
+        if (keycode == Input.Keys.D)
+            movingRight = true;
 
-            if (keycode == Input.Keys.DPAD_LEFT)
-                movingLeft2 = true;
+        if (keycode == Input.Keys.DPAD_LEFT)
+            movingLeft2 = true;
 
-            if (keycode == Input.Keys.DPAD_RIGHT)
-                movingRight2 = true;
+        if (keycode == Input.Keys.DPAD_RIGHT)
+            movingRight2 = true;
 
-            if (keycode == Input.Keys.ENTER)
-                select = true;
-        }
+        if (keycode == Input.Keys.ENTER)
+            select = true;
         return false;
     }
 
