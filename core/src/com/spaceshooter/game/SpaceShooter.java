@@ -17,11 +17,16 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.spaceshooter.game.controller.SerialController;
 import com.sun.java.swing.action.ExitAction;
 import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
@@ -36,6 +41,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean playing = false;
     float elapsedTime = 0f;
     BitmapFont font, fonttitle;
+    String username;
     int score;
     public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
     String screen;
@@ -54,7 +60,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Player player;
     Player player2;
     Enemy enemy;
-
 
     @Override
     public void create() {
@@ -185,12 +190,30 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             menuSelector("1 speler", "2 spelers", "Afsluiten");
         } else if (screen == "leaderboard") {
             drawCenterText(fonttitle, "Leaderboard", 110);
-            Json test = new Json();
-            String json = test.toJson(score);
-            drawCenterText(font, json, 50);
+
+
+            JSONObject test = new JSONObject();
+            test.put("Username: ", username);
+            test.put("Score: ", score);
+//            JSONArray list = new JSONArray();
+//            list.add(username);
+//            list.add(score);
+//            test.put("Spelers", list);
+
+            try (FileWriter file = new FileWriter("Leaderboard.json")) {
+                //file.write(test.toString());
+                 file.append(test.toString());
+                file.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            drawCenterText(font, test.toString(), 120);
+
+            //test.writeValue(new File("C:\\School\\Windesheim\\KBS2a\\test.json")); // Dit doen misschien.
+            // drawCenterText(font, json, 50);
             menuSelector("Afsluiten");
         }
-
         batch.end();
     }
 
@@ -358,59 +381,60 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             selectedOption = 0;
         }
     }
-        public void options (String option){
-            switch (option) {
-                case "1 speler":
-                    playerAmount = 1;
-                    screen = "game";
-                    playing = true;
-                    playMusic();
-                    break;
 
-                case "2 spelers":
-                    playerAmount = 2;
-                    screen = "game";
-                    playing = true;
-                    playMusic();
-                    break;
-                case "Restart":
-                    asteroidManager.reset();
-                    screen = "game";
-                    score = 0;
-                    enemyManager.resetEnemy();
-                    playMusic();
-                    playing = true;
-                    player.reset();
-                    if (playerAmount == 2)
-                        player2.reset();
-                    break;
-                case "Menu":
-                    screen = "start";
-                    player.reset();
-                    if (playerAmount == 2)
-                        player2.reset();
-                    asteroidManager.reset();
-                    score = 0;
-                    enemyManager.resetEnemy();
-                    break;
-                case "Afsluiten":
-                    screen = "game";
-                    System.exit(0);
-                    break;
-                case "Leaderboard":
-                    screen = "leaderboard";
-                    // TODO: 19-May-21
-                    break;
-            }
-        }
+    public void options(String option) {
+        switch (option) {
+            case "1 speler":
+                playerAmount = 1;
+                screen = "game";
+                playing = true;
+                playMusic();
+                break;
 
-        public void playMusic () {
-            long id = GameTheme.play(0.5f);
-            GameTheme.setPitch(id, 1);
-            GameTheme.setLooping(id, false);
-        }
-
-        public void leadboard () {
-
+            case "2 spelers":
+                playerAmount = 2;
+                screen = "game";
+                playing = true;
+                playMusic();
+                break;
+            case "Restart":
+                asteroidManager.reset();
+                screen = "game";
+                score = 0;
+                enemyManager.resetEnemy();
+                playMusic();
+                playing = true;
+                player.reset();
+                if (playerAmount == 2)
+                    player2.reset();
+                break;
+            case "Menu":
+                screen = "start";
+                player.reset();
+                if (playerAmount == 2)
+                    player2.reset();
+                asteroidManager.reset();
+                score = 0;
+                enemyManager.resetEnemy();
+                break;
+            case "Afsluiten":
+                screen = "game";
+                System.exit(0);
+                break;
+            case "Leaderboard":
+                screen = "leaderboard";
+                // TODO: 19-May-21
+                break;
         }
     }
+
+    public void playMusic() {
+        long id = GameTheme.play(0.5f);
+        GameTheme.setPitch(id, 1);
+        GameTheme.setLooping(id, false);
+    }
+
+    public void leadboard() {
+
+    }
+}
