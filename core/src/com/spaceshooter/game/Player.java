@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Player {
     SpriteBatch batch;
@@ -63,7 +64,7 @@ public class Player {
             } else if (powerup == 1) {
                 bulletspeed = 100f;
             } else if (powerup == 2) {
-                bulletspeed = 50;
+                bulletspeed = 10f;
 
             }
         }
@@ -87,6 +88,13 @@ public class Player {
                 laserList.remove(laser.laserSprite);
                 laser.reset();
                 points += 2000;
+            }
+        }
+        Iterator<Laser> iterator = laserList.iterator();
+        for (int i = 0; i < laserList.size(); i++) {
+        Laser laser = laserList.get(i);
+            if (laser.laserSprite.getY() > Gdx.graphics.getHeight()) {
+                laserList.remove(i--);
             }
         }
         return points;
@@ -119,7 +127,6 @@ public class Player {
     public void lasercontroller(boolean playing) {
         for (Laser laser: laserList) {
             laser.lasercontroller(playing);
-            System.out.println("hallo");
         }
         while (laserTimer > tpr) {
             switch (powerup){
@@ -135,22 +142,12 @@ public class Player {
                     laserList.add(new Laser(2f, 20f, "laserBeam1.png", playerSprite.getX()));
                     laserList.add(new Laser(0f, 20f, "laserBeam1.png", playerSprite.getX()));
                     laserList.add(new Laser(-2f, 20f, "laserBeam1.png", playerSprite.getX()));
-                    tpr = 80;
+                    tpr = 1;
                     break;
             }
             laserTimer = 0;
         }
-
-        if (powerup == 0 || powerup == 1) {
-            while (laserTimer > 21 - (bulletspeed / 50)) {
-                laserList.add(new Laser(0f, 50f, "laserBeam1.png", playerSprite.getX()));
-                laserTimer = 0;
-            }
-        } else if (powerup == 2) {
-
-        }
         laserTimer++;
-        System.out.println(laserTimer);
     }
 
 
