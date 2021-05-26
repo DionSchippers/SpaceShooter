@@ -80,10 +80,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.setColor(Color.WHITE);
         font.getData().setScale(1);
         score = 0;
-//        asteroidManager = new AsteroidManager(8);
         enemyManager = new EnemyManager(0);
         starManager = new BackgroundManager(100);
-//        GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
+        GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
 
         player = new Player();
         player.create("SpaceShip2.txt");
@@ -93,6 +92,13 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         powerupManager = new PowerupManager(0);
 
         this.initializeController();
+//
+//        // Skip to single player mode
+//        playerAmount = 1;
+//        screen = "game";
+//        playing = true;
+//        versus = false;
+//        player.dead = false;
     }
 
     public void initializeController() {
@@ -243,7 +249,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     @Override
     public void dispose() {
         batch.dispose();
-//        GameTheme.dispose();
+        GameTheme.dispose();
         player.dispose();
         if (playerAmount == 2)
             player2.dispose();
@@ -435,8 +441,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     }
 
     public void playMusic() {
-//        long id = GameTheme.play(0.5f);
-//        GameTheme.setPitch(id, 1);
-//        GameTheme.setLooping(id, false);
+        long id = GameTheme.play(0.5f);
+        GameTheme.setPitch(id, 1);
+        GameTheme.setLooping(id, false);
     }
 }
