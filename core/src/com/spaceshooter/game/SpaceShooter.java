@@ -44,7 +44,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Sound GameTheme;
 
     BaseController controller;
-    InputMethod inputMethod = InputMethod.SOCKET;
+    InputMethod inputMethod = InputMethod.KEYBOARD;
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
