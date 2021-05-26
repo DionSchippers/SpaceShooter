@@ -30,6 +30,7 @@ public class Player {
     int powerup = 0;
     float bulletspeed = 50f;
     int tpr = 20;
+    int poweruptimer = 0;
 
 
     public void create(String img) {
@@ -55,6 +56,14 @@ public class Player {
             batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
 
             lasercontroller(playing);
+
+            if (powerup != 0) {
+                poweruptimer++;
+            }
+            if (poweruptimer > 1000) {
+                powerup = 0;
+                poweruptimer = 0;
+            }
 
             float x = playerSprite.getX();
             float y = playerSprite.getY();
