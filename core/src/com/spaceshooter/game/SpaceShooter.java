@@ -1,5 +1,8 @@
 package com.spaceshooter.game;
 
+import java.io.*;
+import java.nio.file.Files;
+
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
@@ -22,12 +25,19 @@ import com.badlogic.gdx.utils.JsonWriter;
 import com.spaceshooter.game.controller.SerialController;
 import com.sun.java.swing.action.ExitAction;
 import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
+import org.ietf.jgss.GSSContext;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONStreamAware;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.RandomAccess;
+
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SpriteBatch batch;
@@ -160,6 +170,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 playing = false;
                 screen = "gameover";
                 GameTheme.stop();
+                leaderboardWrite();
+                leaderboardRead();
             }
             font.setColor(Color.RED);
             font.draw(batch, Integer.toString(player.hp), 30f, 60f);
@@ -173,6 +185,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 playing = false;
                 screen = "gameover";
                 GameTheme.stop();
+                leaderboardWrite();
+                leaderboardRead();
             }
 
 
@@ -189,33 +203,53 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             drawCenterText(fonttitle, "Space Shooter", 50);
             menuSelector("1 speler", "2 spelers", "Afsluiten");
         } else if (screen == "leaderboard") {
-            drawCenterText(fonttitle, "Leaderboard", 110);
-
-
-            JSONObject test = new JSONObject();
-            test.put("Username: ", username);
-            test.put("Score: ", score);
-//            JSONArray list = new JSONArray();
-//            list.add(username);
-//            list.add(score);
-//            test.put("Spelers", list);
-
-            try (FileWriter file = new FileWriter("Leaderboard.json")) {
-                //file.write(test.toString());
-                 file.append(test.toString());
-                file.flush();
-
+            drawCenterText(fonttitle, "Leaderboard", 190);
+            menuSelector("Afsluiten");
+/*
+            try {
+                buffWriter = new BufferedWriter(new FileWriter(new File("Leaderboard.json"),true));
+                buffWriter.write(test.toString());
+                System.out.println("Data is geschreven");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Leaderboard.json bestand niet gevonden!");
             }
-            drawCenterText(font, test.toString(), 120);
+            */
 
             //test.writeValue(new File("C:\\School\\Windesheim\\KBS2a\\test.json")); // Dit doen misschien.
             // drawCenterText(font, json, 50);
-            menuSelector("Afsluiten");
+
         }
         batch.end();
     }
+
+    public void leaderboardWrite() {
+        JSONObject test = new JSONObject();
+        test.put("Username: ", username);
+        test.put("Score: ", score);
+
+        try {
+            Files.write(Paths.get("Leaderboard.json"),
+                    test.toString().getBytes(), StandardOpenOption.APPEND);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    } // einde functie leaderboardWrite
+
+    public void leaderboardRead() {
+        JSONParser jsonParser = new JSONParser();
+
+        try (FileReader reader = new FileReader("Leaderboard.json")) {
+            Object obj = jsonParser.parse(reader);
+            JSONArray leaderboardList = new JSONArray();
+            leaderboardList.add(obj);
+            drawCenterText(font, leaderboardList.toString(), 120);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+    } //einde functie leaderboardRead
+
 
     @Override
     public void dispose() {
@@ -432,9 +466,5 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         long id = GameTheme.play(0.5f);
         GameTheme.setPitch(id, 1);
         GameTheme.setLooping(id, false);
-    }
-
-    public void leadboard() {
-
     }
 }
