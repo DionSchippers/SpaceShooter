@@ -40,7 +40,7 @@ public class AsteroidManager {
                 if (hasGoneOffscreen(asteroid)) {
                     asteroid.redistribute();
                 }
-                asteroid.getSprite().translateY(-3f * (1f + score/10000f));
+                asteroid.getSprite().translateY(-3f * (1f + (float)Math.sqrt((float)score/5000)));
                 asteroid.getSprite().draw(batch);
                 asteroid.render(batch);
                 float x = asteroid.xVALint;

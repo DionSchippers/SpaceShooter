@@ -4,6 +4,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -30,6 +31,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     int playerAmount;
     boolean versus = false;
     Sound GameTheme;
+
 
     SerialController serialController = null;
     boolean useSerialInput = false;
@@ -211,13 +213,21 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 }
             }
             drawCenterText(font, "Game Over", 100);
-            menuSelector("Restart", "Menu", "Afsluiten");
+            String arr[] = {"Restart", "Menu", "Afsluiten"};
+            menuSelector(arr);
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
-            menuSelector("1 speler", "2 spelers", "Afsluiten");
+            String arr[] = {"1 speler", "2 spelers", "Afsluiten"};
+            menuSelector(arr);
         } else if (screen == "multiselect") {
             drawCenterText(font, "Select gamemode", 50);
-            menuSelector("Co-op", "Versus", "Menu");
+            String arr[] = {"Co-op", "Versus", "Menu"};
+            menuSelector(arr);
+        } else {
+            drawCenterText(font, "Er is helaas iets fout gegaan", 50);
+            drawCenterText(font, "Druk op ENTER om terug te gaan naar het menu", 10);
+            String arr[] = {"Menu"};
+            menuSelector(arr);
         }
         batch.end();
     }
@@ -318,7 +328,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.draw(batch, layout, fontX, fontY);
     }
 
-    public void menuSelector(String option1, String option2, String option3) {
+    public void menuSelector(String[] options) {
         font.setColor(Color.GRAY);
         if (movingLeft && selecting || movingLeft2 && selecting) {
             selectedOption--;
@@ -328,36 +338,24 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             selectedOption++;
             selecting = false;
         }
-        if (selectedOption > 2) selectedOption = 0;
-        if (selectedOption < 0) selectedOption = 2;
+        if (selectedOption > options.length-1) selectedOption = 0;
+        if (selectedOption < 0) selectedOption = options.length-1;
 
-        if (selectedOption == 0)
-            font.setColor(Color.WHITE);
-        drawCenterText(font, option1, -40);
-        font.setColor(Color.GRAY);
-
-        if (selectedOption == 1)
-            font.setColor(Color.WHITE);
-        drawCenterText(font, option2, -80);
-        font.setColor(Color.GRAY);
-
-        if (selectedOption == 2)
-            font.setColor(Color.WHITE);
-        drawCenterText(font, option3, -120);
-        font.setColor(Color.WHITE);
+        int i = 0;
+        for (String option: options) {
+            if (selectedOption == i)
+                font.setColor(Color.WHITE);
+            drawCenterText(font, option, -40 + i * -40);
+            font.setColor(Color.GRAY);
+            i++;
+        }
 
         if (select && selecting) {
             selecting = false;
-            if (selectedOption == 0) {
-                options(option1);
-            } else if (selectedOption == 1) {
-                options(option2);
-            } else if (selectedOption == 2) {
-                options(option3);
-            }
+            options(options[selectedOption]);
             selectedOption = 0;
         }
-
+        font.setColor(Color.WHITE);
     }
 
     public void options(String option) {
@@ -414,6 +412,12 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             case "Afsluiten":
                 screen = "game";
                 System.exit(0);
+                break;
+            case "Endless":
+                screen = "endlessselect";
+                break;
+            case "Campaign":
+                screen = "campaignselect";
                 break;
         }
     }

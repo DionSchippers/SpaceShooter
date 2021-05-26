@@ -59,14 +59,6 @@ public class Player {
             float x = playerSprite.getX();
             float y = playerSprite.getY();
             c_player.set(x + 48, y + 48, 48);
-            if (powerup == 0) {
-                bulletspeed = 50f;
-            } else if (powerup == 1) {
-                bulletspeed = 100f;
-            } else if (powerup == 2) {
-                bulletspeed = 10f;
-
-            }
         }
         batch.end();
     }
@@ -136,13 +128,13 @@ public class Player {
                     break;
                 case 1:
                     laserList.add(new Laser(0f, 50f, "laserBeam1.png", playerSprite.getX()));
-                    tpr = 5;
+                    tpr = 10;
                     break;
                 case 2:
                     laserList.add(new Laser(2f, 20f, "laserBeam1.png", playerSprite.getX()));
                     laserList.add(new Laser(0f, 20f, "laserBeam1.png", playerSprite.getX()));
                     laserList.add(new Laser(-2f, 20f, "laserBeam1.png", playerSprite.getX()));
-                    tpr = 1;
+                    tpr = 80;
                     break;
             }
             laserTimer = 0;

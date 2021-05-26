@@ -36,7 +36,7 @@ public class BackgroundManager {
             if (hasGoneOffscreen(star)) {
                 star.redistribute();
             }
-            star.getSprite().translateY(-1f * (1f + score/10000f));
+            star.getSprite().translateY(-1f * (1f + (float)Math.sqrt((float)score/5000)));
             star.getSprite().draw(batch);
             float x = star.xVALint;
             float y = star.getY();
