@@ -43,7 +43,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Sound GameTheme;
 
     BaseController controller;
-    InputMethod inputMethod = InputMethod.SOCKET;
+    InputMethod inputMethod = InputMethod.KEYBOARD;
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
@@ -81,7 +81,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         asteroidManager = new AsteroidManager(8);
         enemyManager = new EnemyManager(0);
         starManager = new BackgroundManager(100);
-        GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
+//        GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
 
         player = new Player();
         player.create("SpaceShip2.txt");
@@ -168,7 +168,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             if (asteroidManager.colWithPlayer(player.c_player) || asteroidManager.colWithPlayer(player2.c_player)) {
                 playing = false;
                 screen = "gameover";
-                GameTheme.stop();
+//                GameTheme.stop();
             }
             font.setColor(Color.RED);
             font.draw(batch, Integer.toString(player.hp), 30f, 60f);
@@ -181,7 +181,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             if (player.hp < 1 || player2.hp < 1) {
                 playing = false;
                 screen = "gameover";
-                GameTheme.stop();
+//                GameTheme.stop();
             }
 
 
@@ -205,7 +205,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     @Override
     public void dispose() {
         batch.dispose();
-        GameTheme.dispose();
+//        GameTheme.dispose();
         player.dispose();
         if (playerAmount == 2)
             player2.dispose();
@@ -381,8 +381,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     }
 
     public void playMusic() {
-        long id = GameTheme.play(0.5f);
-        GameTheme.setPitch(id, 1);
-        GameTheme.setLooping(id, false);
+//        long id = GameTheme.play(0.5f);
+//        GameTheme.setPitch(id, 1);
+//        GameTheme.setLooping(id, false);
     }
 }
