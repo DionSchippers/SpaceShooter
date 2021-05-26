@@ -22,7 +22,7 @@ import com.spaceshooter.game.controller.SerialController;
 import java.io.IOException;
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
-    final String socketControllerIp = "127.0.0.1";
+    final String socketControllerIp = "192.168.178.110";
     final int socketControllerPort = 42420;
 
     SpriteBatch batch;
@@ -44,7 +44,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     Sound GameTheme;
 
     BaseController controller;
-    InputMethod inputMethod = InputMethod.KEYBOARD;
+    InputMethod inputMethod = InputMethod.SOCKET;
 
     AsteroidManager asteroidManager;
     EnemyManager enemyManager;
