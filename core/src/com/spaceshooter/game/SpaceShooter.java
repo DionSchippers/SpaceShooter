@@ -1,6 +1,7 @@
 package com.spaceshooter.game;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 import com.badlogic.gdx.*;
@@ -15,6 +16,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import sun.nio.cs.UTF_8;
 
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -173,15 +175,15 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             if (playerAmount == 2)
                 score += player2.hitboxController(asteroidManager, enemyManager);
 
-        } else if (screen == "gameover") {
+        } else if (screen.equals("gameover")) {
             drawCenterText(font, "Je hebt " + Integer.toString(score) + " punten behaald!", 10);
             drawCenterText(font, "Game Over", 50);
             menuSelector("Restart", "Menu", "Leaderboard");
 
-        } else if (screen == "start") {
+        } else if (screen.equals("start")) {
             drawCenterText(fonttitle, "Space Shooter", 50);
             menuSelector("1 speler", "2 spelers", "Afsluiten");
-        } else if (screen == "leaderboard") {
+        } else if (screen.equals("leaderboard")) {
             drawCenterText(fonttitle, "Leaderboard", 190);
             menuSelector("Afsluiten", "Restart");
             leaderboardRead();
@@ -203,6 +205,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
             // Check if the score exists in the Leaderboard.json
             if (leaderboardArray.get(i) != null) {
+
+                // Parse the score object from the JSONArray to an JSONObject
                 JSONObject score = (JSONObject) leaderboardArray.get(i);
 
                 // Check if the current game score is higher than the stored high score
@@ -213,20 +217,39 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 break;
             }
         }
+
+        // Check if the index variable has been updated
+        // Indicating a high score should be updated
+        if (index != -1) {
+            // Make a new JSONObject for our new score
+            JSONObject newScore = new JSONObject();
+            newScore.put("score", this.score);
+            leaderboardArray.set(index, newScore);
+        }
+
+        System.out.printf("Score update: %s%n", index != -1 ? "YES" : "NO");
+        if (index != -1) {
+            System.out.printf("Plek: %d%n", index + 1);
+            System.out.printf("New score: %d%n", this.score);
+        }
+
         try {
-            Files.write(Paths.get("Leaderboard.json"),
-                    leaderboardArray.toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
-        } catch (Exception e) {
+            Files.write(Paths.get("Leaderboard.json"), leaderboardArray.toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     } // einde functie leaderboardWrite
 
     public void leaderboardRead() {
         JSONArray leaderboardArray = getLeaderboard(new JSONParser());
+        if (leaderboardArray == null) {
+            return;
+        }
+
         for (int i = leaderboardArray.size(); i > 0; i--) {
             if (leaderboardArray.get(i - 1) != null) {
                 JSONObject score = (JSONObject) leaderboardArray.get(i - 1);
-                drawCenterText(font, String.format("Score %d: %s", leaderboardArray.size() - i, score.get("score")), 120 - (50 * i));
+                drawCenterText(font, String.format("Score %d: %s", (leaderboardArray.size() - i) + 1, score.get("score")), 120 - (50 * (leaderboardArray.size() - i)));
             } else {
                 break;
             }
