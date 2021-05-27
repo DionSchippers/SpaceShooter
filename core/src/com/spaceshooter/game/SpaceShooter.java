@@ -10,32 +10,12 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonWriter;
 import com.spaceshooter.game.controller.SerialController;
-import com.sun.java.swing.action.ExitAction;
-import org.graalvm.compiler.lir.amd64.AMD64BinaryConsumer;
-import org.ietf.jgss.GSSContext;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONStreamAware;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.util.ArrayList;
-import java.util.RandomAccess;
-
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -51,7 +31,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     boolean playing = false;
     float elapsedTime = 0f;
     BitmapFont font, fonttitle;
-    String username;
     int score;
     public static final String FONT_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789][_!$%#@|\\/?-+=()*&.;,{}\"´`'<>";
     String screen;
@@ -205,50 +184,54 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         } else if (screen == "leaderboard") {
             drawCenterText(fonttitle, "Leaderboard", 190);
             menuSelector("Afsluiten");
-/*
-            try {
-                buffWriter = new BufferedWriter(new FileWriter(new File("Leaderboard.json"),true));
-                buffWriter.write(test.toString());
-                System.out.println("Data is geschreven");
-            } catch (IOException e) {
-                System.out.println("Leaderboard.json bestand niet gevonden!");
-            }
-            */
-
-            //test.writeValue(new File("C:\\School\\Windesheim\\KBS2a\\test.json")); // Dit doen misschien.
-            // drawCenterText(font, json, 50);
-
+            leaderboardRead();
         }
         batch.end();
     }
 
     public void leaderboardWrite() {
-        JSONObject test = new JSONObject();
-        test.put("Username: ", username);
-        test.put("Score: ", score);
-
+        JSONArray leaderboardArray = getLeaderboard(new JSONParser());
+        for (int i = 0; i < 5; i++) {
+            if (leaderboardArray.get(i) != null) {
+                JSONObject score = (JSONObject) leaderboardArray.get(i);
+                if (this.score > (long) score.get("score")) {
+                    JSONObject newScore = new JSONObject();
+                    newScore.put("score", this.score);
+                    leaderboardArray.set(i, newScore);
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
         try {
             Files.write(Paths.get("Leaderboard.json"),
-                    test.toString().getBytes(), StandardOpenOption.APPEND);
+                    leaderboardArray.toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
         }
     } // einde functie leaderboardWrite
 
     public void leaderboardRead() {
-        JSONParser jsonParser = new JSONParser();
+        JSONArray leaderboardArray = getLeaderboard(new JSONParser());
+        for (int i = leaderboardArray.size(); i > 0; i--) {
+            if (leaderboardArray.get(i - 1) != null) {
+                JSONObject score = (JSONObject) leaderboardArray.get(i - 1);
+                drawCenterText(font, String.format("Score %d: %s", leaderboardArray.size() - i, score.get("score")), 120 - (50 * i));
+            } else {
+                break;
+            }
+        }
+    } //einde functie leaderboardRead
 
+    private JSONArray getLeaderboard(JSONParser jsonParser) {
         try (FileReader reader = new FileReader("Leaderboard.json")) {
-            Object obj = jsonParser.parse(reader);
-            JSONArray leaderboardList = new JSONArray();
-            leaderboardList.add(obj);
-            drawCenterText(font, leaderboardList.toString(), 120);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            return (JSONArray) jsonParser.parse(reader);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
         }
-    } //einde functie leaderboardRead
+        return null;
+    }
 
 
     @Override
