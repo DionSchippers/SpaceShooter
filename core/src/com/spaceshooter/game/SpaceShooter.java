@@ -183,7 +183,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             menuSelector("1 speler", "2 spelers", "Afsluiten");
         } else if (screen == "leaderboard") {
             drawCenterText(fonttitle, "Leaderboard", 190);
-            menuSelector("Afsluiten");
+            menuSelector("Afsluiten", "Restart");
             leaderboardRead();
         }
         batch.end();
@@ -191,15 +191,24 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     public void leaderboardWrite() {
         JSONArray leaderboardArray = getLeaderboard(new JSONParser());
-        for (int i = 0; i < 5; i++) {
+        if (leaderboardArray == null) {
+            return;
+        }
+
+        // Store the index of the current passed score.
+        int index = -1;
+
+        // Loop through the 5 highscores stored in Leaderboard.json
+        for (int i = 0; i < leaderboardArray.size(); i++) {
+
+            // Check if the score exists in the Leaderboard.json
             if (leaderboardArray.get(i) != null) {
                 JSONObject score = (JSONObject) leaderboardArray.get(i);
-                if (this.score > (long) score.get("score")) {
-                    JSONObject newScore = new JSONObject();
-                    newScore.put("score", this.score);
-                    leaderboardArray.set(i, newScore);
-                    break;
-                }
+
+                // Check if the current game score is higher than the stored high score
+                // If True store the high score array index in the index variable
+                if (this.score > (long) score.get("score"))
+                    index = i;
             } else {
                 break;
             }
@@ -372,7 +381,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     }
 
-    public void menuSelector(String option1) {
+    public void menuSelector(String option1, String option2) {
         font.setColor(Color.GRAY);
         if (movingLeft && selecting || movingLeft2 && selecting) {
             selectedOption--;
@@ -387,13 +396,20 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
         if (selectedOption == 0)
             font.setColor(Color.WHITE);
-        drawCenterText(font, option1, -40);
+        drawCenterText(font, option1, -130);
         font.setColor(Color.GRAY);
+
+        if (selectedOption == 1)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option2, -180);
+        font.setColor(Color.WHITE);
 
         if (select && selecting) {
             selecting = false;
             if (selectedOption == 0) {
                 options(option1);
+            }else if (selectedOption == 1){
+                options(option2);
             }
             selectedOption = 0;
         }
@@ -440,7 +456,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 break;
             case "Leaderboard":
                 screen = "leaderboard";
-                // TODO: 19-May-21
                 break;
         }
     }
