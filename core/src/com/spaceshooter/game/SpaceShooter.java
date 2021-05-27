@@ -48,7 +48,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     SerialController serialController = null;
     boolean useSerialInput = false;
     boolean useKeyboardInput = true;
-    BaseController controller;
+    BaseController controller1;
+    BaseController controller2;
     InputMethod inputMethod = InputMethod.KEYBOARD;
 
     AsteroidManager asteroidManager;
@@ -114,12 +115,12 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 serialController.autoChooseCommPort();
 
                 // The program may now use the controller's getDirection()
-                this.controller = serialController;
+                controller1 = serialController;
                 break;
 
             case SOCKET:
                 // The program may now use the controller's getDirection()
-                this.controller = new SocketController(socketControllerIp, socketControllerPort);
+                controller2 = new SocketController(socketControllerIp, socketControllerPort);
                 break;
 
             default:
@@ -128,9 +129,9 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     }
 
     public void updateControllerInput() {
-        if (this.controller != null) {
+        if (controller1 != null) {
             try {
-                int direction = this.controller.getDirection();
+                int direction = this.controller1.getDirection();
                 if (direction == 1) {
                     movingRight = true;
                     movingLeft = false;
@@ -140,6 +141,23 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 } else {
                     movingRight = false;
                     movingLeft = false;
+                }
+            } catch (IOException e) {
+
+            }
+        }
+        if (controller2 != null) {
+            try {
+                int direction = this.controller2.getDirection();
+                if (direction == 1) {
+                    movingRight2 = true;
+                    movingLeft2 = false;
+                } else if (direction == -1) {
+                    movingRight2 = false;
+                    movingLeft2 = true;
+                } else {
+                    movingRight2 = false;
+                    movingLeft2 = false;
                 }
             } catch (IOException e) {
 
