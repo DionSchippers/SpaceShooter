@@ -1,6 +1,5 @@
 package com.spaceshooter.game;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -25,10 +24,7 @@ public class EnemyManager {
 
     public void render(boolean playing, float elapsedTime, int score, Player player, Player player2) {
         if (playing) {
-//            System.out.println(score);
-//            System.out.println(scoreAmount);
             if (scoreAmount < score) {
-//                System.out.println(scoreAmount);
                 this.enemies.add(new Enemy("EnemyShip.txt"));
                 scoreAmount += 10000;
             }

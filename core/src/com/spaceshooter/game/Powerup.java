@@ -4,21 +4,23 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Circle;
 
-public class Asteroid {
+import java.util.concurrent.ThreadLocalRandom;
+
+public class Powerup {
     protected Texture texture;
     protected Sprite sprite;
     protected TextureAtlas explosionTexture;
     protected Animation<TextureRegion> explosionAnimation;
     protected Sprite explosion;
-    public Circle c_asteroid;
+    public Circle c_powerup;
     int xVALint;
     int yVALint;
     private float time;
     boolean exploding;
     Sound explosionSound;
+    int type;
 
     public void setxVALint(int xVALint) {
         this.xVALint = xVALint;
@@ -35,7 +37,7 @@ public class Asteroid {
         xVALint = (int) xVAL;
         int screenTop = Gdx.graphics.getHeight();
         sprite.setPosition(xVALint, screenTop);
-        c_asteroid = new Circle();
+        c_powerup = new Circle();
         exploding = false;
     }
 
@@ -48,14 +50,15 @@ public class Asteroid {
         yVALint = (int) yVAL;
         int screenTop = Gdx.graphics.getHeight();
         sprite.setPosition(xVALint, yVALint);
-        c_asteroid = new Circle();
+        c_powerup = new Circle();
         exploding = false;
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
+        type = ThreadLocalRandom.current().nextInt(1, 1 + 1);
     }
 
-    public Asteroid() {
+    public Powerup() {
 
-        texture = new Texture("Asteroid.png");
+        texture = new Texture("Powerup.png");
         sprite = new Sprite(texture);
         explosionTexture = new TextureAtlas("Explosion.txt");
         explosionAnimation = new Animation(0.15f, explosionTexture.getRegions());
