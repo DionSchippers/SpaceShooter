@@ -93,7 +93,7 @@ public class Player {
         }
         Iterator<Laser> iterator = laserList.iterator();
         for (int i = 0; i < laserList.size(); i++) {
-        Laser laser = laserList.get(i);
+            Laser laser = laserList.get(i);
             if (laser.laserSprite.getY() > Gdx.graphics.getHeight()) {
                 laserList.remove(i--);
             }

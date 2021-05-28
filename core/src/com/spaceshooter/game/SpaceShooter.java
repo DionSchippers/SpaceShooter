@@ -18,9 +18,17 @@ import com.spaceshooter.game.controller.BaseController;
 import com.spaceshooter.game.controller.SerialController;
 import com.spaceshooter.game.controller.SocketController;
 import com.spaceshooter.game.controller.SerialController;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+
 
 public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
     final String socketControllerIp = "192.168.178.110";
@@ -86,6 +94,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.setColor(Color.WHITE);
         font.getData().setScale(1);
         score = 0;
+        asteroidManager = new AsteroidManager(8);
         enemyManager = new EnemyManager(0);
         starManager = new BackgroundManager(100);
         GameTheme = Gdx.audio.newSound(Gdx.files.internal("GameTheme.ogg"));
@@ -205,6 +214,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                     playing = false;
                     screen = "gameover";
                     GameTheme.stop();
+                    leaderboardWrite();
+                    leaderboardRead();
                 }
             } else {
                 font.draw(batch, Integer.toString(player.score), 20f, Gdx.graphics.getHeight()-20f);
@@ -231,6 +242,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                     playing = false;
                     screen = "gameover";
                     GameTheme.stop();
+                    leaderboardWrite();
+                    leaderboardRead();
                 }
                 if (player.hp < 1) {
                     player.dead = true;
@@ -268,7 +281,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 }
             }
             drawCenterText(font, "Game Over", 100);
-            String arr[] = {"Restart", "Menu", "Afsluiten"};
+            String arr[] = {"Restart", "Menu", "Leaderboard"};
             menuSelector(arr);
         } else if (screen == "start") {
             drawCenterText(fonttitle, "Space Shooter", 50);
@@ -278,6 +291,10 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             drawCenterText(font, "Select gamemode", 50);
             String arr[] = {"Co-op", "Versus", "Menu"};
             menuSelector(arr);
+        } else if (screen.equals("leaderboard")) {
+            drawCenterText(fonttitle, "Leaderboard", 190);
+            menuSelector("Afsluiten", "Restart");
+            leaderboardRead();
         } else {
             drawCenterText(font, "Er is helaas iets fout gegaan", 50);
             drawCenterText(font, "Druk op ENTER om terug te gaan naar het menu", 10);
@@ -286,6 +303,85 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         }
         batch.end();
     }
+
+
+
+
+
+    public void leaderboardWrite() {
+        JSONArray leaderboardArray = getLeaderboard(new JSONParser());
+        if (leaderboardArray == null) {
+            return;
+        }
+
+        // Store the index of the current passed score.
+        int index = -1;
+
+        // Loop through the 5 highscores stored in Leaderboard.json
+        for (int i = 0; i < leaderboardArray.size(); i++) {
+
+            // Check if the score exists in the Leaderboard.json
+            if (leaderboardArray.get(i) != null) {
+
+                // Parse the score object from the JSONArray to an JSONObject
+                JSONObject score = (JSONObject) leaderboardArray.get(i);
+
+                // Check if the current game score is higher than the stored high score
+                // If True store the high score array index in the index variable
+                if (this.score > (long) score.get("score"))
+                    index = i;
+            } else {
+                break;
+            }
+        }
+
+        // Check if the index variable has been updated
+        // Indicating a high score should be updated
+        if (index != -1) {
+            // Make a new JSONObject for our new score
+            JSONObject newScore = new JSONObject();
+            newScore.put("score", this.score);
+            leaderboardArray.set(index, newScore);
+        }
+
+        System.out.printf("Score update: %s%n", index != -1 ? "YES" : "NO");
+        if (index != -1) {
+            System.out.printf("Plek: %d%n", index + 1);
+            System.out.printf("New score: %d%n", this.score);
+        }
+
+        try {
+            Files.write(Paths.get("Leaderboard.json"), leaderboardArray.toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    } // einde functie leaderboardWrite
+
+    public void leaderboardRead() {
+        JSONArray leaderboardArray = getLeaderboard(new JSONParser());
+        if (leaderboardArray == null) {
+            return;
+        }
+
+        for (int i = leaderboardArray.size(); i > 0; i--) {
+            if (leaderboardArray.get(i - 1) != null) {
+                JSONObject score = (JSONObject) leaderboardArray.get(i - 1);
+                drawCenterText(font, String.format("Score %d: %s", (leaderboardArray.size() - i) + 1, score.get("score")), 120 - (50 * (leaderboardArray.size() - i)));
+            } else {
+                break;
+            }
+        }
+    } //einde functie leaderboardRead
+
+    private JSONArray getLeaderboard(JSONParser jsonParser) {
+        try (FileReader reader = new FileReader("Leaderboard.json")) {
+            return (JSONArray) jsonParser.parse(reader);
+        } catch (IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     @Override
     public void dispose() {
@@ -298,20 +394,22 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.A)
-            movingLeft = true;
+        if (useKeyboardInput) {
+            if (keycode == Input.Keys.A)
+                movingLeft = true;
 
-        if (keycode == Input.Keys.D)
-            movingRight = true;
+            if (keycode == Input.Keys.D)
+                movingRight = true;
 
-        if (keycode == Input.Keys.DPAD_LEFT)
-            movingLeft2 = true;
+            if (keycode == Input.Keys.DPAD_LEFT)
+                movingLeft2 = true;
 
-        if (keycode == Input.Keys.DPAD_RIGHT)
-            movingRight2 = true;
+            if (keycode == Input.Keys.DPAD_RIGHT)
+                movingRight2 = true;
 
-        if (keycode == Input.Keys.ENTER)
-            select = true;
+            if (keycode == Input.Keys.ENTER)
+                select = true;
+        }
         return false;
     }
 
@@ -411,38 +509,57 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
         font.setColor(Color.WHITE);
     }
 
+    public void menuSelector(String option1, String option2) {
+        font.setColor(Color.GRAY);
+        if (movingLeft && selecting || movingLeft2 && selecting) {
+            selectedOption--;
+            selecting = false;
+        }
+        if (movingRight && selecting || movingRight2 && selecting) {
+            selectedOption++;
+            selecting = false;
+        }
+        if (selectedOption > 1) selectedOption = 0;
+        if (selectedOption < 0) selectedOption = 1;
+
+        if (selectedOption == 0)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option1, -130);
+        font.setColor(Color.GRAY);
+
+        if (selectedOption == 1)
+            font.setColor(Color.WHITE);
+        drawCenterText(font, option2, -180);
+        font.setColor(Color.WHITE);
+
+        if (select && selecting) {
+            selecting = false;
+            if (selectedOption == 0) {
+                options(option1);
+            }else if (selectedOption == 1){
+                options(option2);
+            }
+            selectedOption = 0;
+        }
+    }
+
     public void options(String option) {
         switch (option) {
             case "1 speler":
                 playerAmount = 1;
                 screen = "game";
                 playing = true;
-                versus = false;
-                player.dead = false;
                 playMusic();
                 break;
+
             case "2 spelers":
-                screen = "multiselect";
-                break;
-            case "Co-op":
                 playerAmount = 2;
                 screen = "game";
                 playing = true;
-                versus = false;
-                player.dead = false;
                 playMusic();
-                break;
-            case "Versus":
-                playerAmount = 2;
-                screen = "game";
-                playing = true;
-                versus = true;
-                playMusic();
-                player.dead = false;
                 break;
             case "Restart":
                 asteroidManager.reset();
-                powerupManager.reset();
                 screen = "game";
                 score = 0;
                 enemyManager.resetEnemy();
@@ -458,7 +575,6 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 if (playerAmount == 2)
                     player2.reset();
                 asteroidManager.reset();
-                powerupManager.reset();
                 score = 0;
                 enemyManager.resetEnemy();
                 break;
@@ -466,11 +582,8 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 screen = "game";
                 System.exit(0);
                 break;
-            case "Endless":
-                screen = "endlessselect";
-                break;
-            case "Campaign":
-                screen = "campaignselect";
+            case "Leaderboard":
+                screen = "leaderboard";
                 break;
         }
     }
