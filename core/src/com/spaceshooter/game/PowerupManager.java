@@ -39,7 +39,7 @@ public class PowerupManager {
                 scoreAmount += 5000;
             }
             for (Powerup powerup : powerups) {
-                powerup.getSprite().translateY(-3f * (1f + score/10000f));
+                powerup.getSprite().translateY(-3f * (1f + (float)Math.sqrt((float)score/5000f)));
                 powerup.getSprite().draw(batch);
                 powerup.render(batch);
                 float x = powerup.xVALint;
@@ -52,6 +52,7 @@ public class PowerupManager {
 
     public void reset() {
         powerups.clear();
+        scoreAmount = 5000;
     }
 
     public boolean colWithPlayer(Circle c_player) {
