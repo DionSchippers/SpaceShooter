@@ -293,7 +293,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
             menuSelector(arr);
         } else if (screen.equals("leaderboard")) {
             drawCenterText(fonttitle, "Leaderboard", 190);
-            menuSelector("Afsluiten", "Restart");
+            menuSelector("Menu", "Restart");
             leaderboardRead();
         } else {
             drawCenterText(font, "Er is helaas iets fout gegaan", 50);
@@ -549,17 +549,32 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 playerAmount = 1;
                 screen = "game";
                 playing = true;
+                versus = false;
+                player.dead = false;
                 playMusic();
                 break;
-
             case "2 spelers":
+                screen = "multiselect";
+                break;
+            case "Co-op":
                 playerAmount = 2;
                 screen = "game";
                 playing = true;
+                versus = false;
+                player.dead = false;
                 playMusic();
+                break;
+            case "Versus":
+                playerAmount = 2;
+                screen = "game";
+                playing = true;
+                versus = true;
+                playMusic();
+                player.dead = false;
                 break;
             case "Restart":
                 asteroidManager.reset();
+                powerupManager.reset();
                 screen = "game";
                 score = 0;
                 enemyManager.resetEnemy();
@@ -575,6 +590,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 if (playerAmount == 2)
                     player2.reset();
                 asteroidManager.reset();
+                powerupManager.reset();
                 score = 0;
                 enemyManager.resetEnemy();
                 break;
@@ -587,6 +603,7 @@ public class SpaceShooter extends ApplicationAdapter implements InputProcessor {
                 break;
         }
     }
+
 
     public void playMusic() {
         long id = GameTheme.play(0.5f);
