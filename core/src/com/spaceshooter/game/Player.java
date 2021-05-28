@@ -27,10 +27,6 @@ public class Player {
     Rectangle r_laser;
     int hp;
     Sound damageSound;
-    int score = 0;
-    boolean dead = false;
-    int powerup = 0;
-    float bulletspeed = 50f;
 
 
     public void create(String img) {
@@ -51,31 +47,23 @@ public class Player {
 
     public void playerController(float elapsedTime, boolean playing) {
         batch.begin();
-        if (!dead) {
-            for (Sprite sprite : laserList) {
-                sprite.draw(batch);
-            }
-
-            batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
-
-            lasercontroller(playing);
-
-            float x = playerSprite.getX();
-            float y = playerSprite.getY();
-            c_player.set(x + 48, y + 48, 48);
-            if (powerup == 0) {
-                bulletspeed = 50f;
-            } else if (powerup == 1) {
-                bulletspeed = 100f;
-            } else if (powerup == 2) {
-                bulletspeed = 50;
-
-            }
+        for (Sprite sprite : laserList) {
+            sprite.draw(batch);
         }
+
+        batch.draw(playerAnimation.getKeyFrame(elapsedTime, true), playerSprite.getX(), playerSprite.getY());
+
+        lasercontroller(playing);
+
+        float x = playerSprite.getX();
+        float y = playerSprite.getY();
+        c_player.set(x + 48, y + 48, 48);
+
+
         batch.end();
     }
 
-    public int hitboxController(AsteroidManager asteroidManager, EnemyManager enemyManager, PowerupManager powerupManager) {
+    public int hitboxController(AsteroidManager asteroidManager, EnemyManager enemyManager) {
         if (asteroidManager.colWithLaser(r_laser)) {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
@@ -83,12 +71,6 @@ public class Player {
             return 1000;
         }
         if (enemyManager.colWithLaser(r_laser)) {
-            laserList.remove(laserSprite);
-            laserSprite.setAlpha(0);
-            laserSprite.setPosition(laserSprite.getX(), 10000f);
-            return 2000;
-        }
-        if (powerupManager.colWithLaser(r_laser, this)) {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
             laserSprite.setPosition(laserSprite.getX(), 10000f);
@@ -124,18 +106,14 @@ public class Player {
             laserList.remove(laserSprite);
             laserSprite.setAlpha(0);
         } else if (playing) {
-            laserSprite.translateY(bulletspeed);
+            laserSprite.translateY(50f);
             r_laser.setPosition(laserSprite.getX(), laserSprite.getY());
         }
         laserTimer++;
-        if (powerup == 0 || powerup == 1) {
-            while (laserTimer > 21 - (bulletspeed / 50)) {
-                createLaser(playerSprite.getX());
-                r_laser.set(laserSprite.getX() - laserSprite.getWidth() / 2, laserSprite.getY() - laserSprite.getHeight() * 1.5f, laserSprite.getWidth(), laserSprite.getHeight() * 3);
-                laserTimer = 0;
-            }
-        } else if (powerup == 2) {
-
+        while (laserTimer > 20) {
+            createLaser(playerSprite.getX());
+            r_laser.set(laserSprite.getX() - laserSprite.getWidth() / 2, laserSprite.getY() - laserSprite.getHeight() / 2, laserSprite.getWidth(), laserSprite.getHeight());
+            laserTimer = 0;
         }
     }
 
@@ -149,8 +127,6 @@ public class Player {
         playerSprite.setX(Gdx.graphics.getWidth() / 2 - 48);
         laserSprite.setY(10000);
         hp = 3;
-        score = 0;
-        dead = false;
     }
 
     public boolean colWithLaser(Rectangle r_laser) {
